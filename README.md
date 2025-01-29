@@ -43,7 +43,7 @@ Here's an example of the data flow:
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.9)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
 
@@ -72,7 +72,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
-Description:   A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
   - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
   - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
@@ -116,7 +116,7 @@ Default: `true`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
+Description:   Controls the resource lock configuration for this resource. The following properties can be specified:
 
   - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
   - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
@@ -134,7 +134,7 @@ Default: `null`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
-Description:   Controls the Managed Identity configuration on this resource. The following properties can be specified:
+Description:   Controls the managed identity configuration on this resource. The following properties can be specified:
 
   - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
   - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
@@ -152,7 +152,7 @@ Default: `{}`
 
 ### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
 
-Description:   A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
@@ -163,7 +163,7 @@ Description:   A map of private endpoints to create on the Key Vault. The map ke
     - `condition` - (Optional) The condition under which the role assignment is active.
     - `condition_version` - (Optional) The version of the condition.
     - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity to assign the role to.
-    - `principal_type` - (Optional) The type of principal to assign the role to. Possible values are `\"User\"`, `\"Group\"`, `\"ServicePrincipal\"`, and `\"MSI\"`.  
+    - `principal_type` - (Optional) The type of principal to assign the role to. Possible values are `\"User\"`, `\"Group\"`, `\"ServicePrincipal\"`, and `\"MSI\"`.
   - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
@@ -249,7 +249,7 @@ Default: `true`
 ### <a name="input_role_assignment_definition_scope"></a> [role\_assignment\_definition\_scope](#input\_role\_assignment\_definition\_scope)
 
 Description: The scope at which the role assignments should be created.  
-This is typically the resource ID of the subscription of the reosurce, but could also be the management group for resources deployed there.
+This is typically the resource ID of the subscription of the resource, but could also be the management group for resources deployed there.
 
 Must be specified when `role_assignments` are defined.
 

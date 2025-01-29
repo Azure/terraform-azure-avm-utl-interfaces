@@ -33,8 +33,8 @@ variable "private_endpoints" {
   default     = {}
   nullable    = false
   description = <<DESCRIPTION
-  A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-  
+  A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
     - `role_definition_id_or_name` - The ID or name of the role definition to assign.
@@ -44,7 +44,7 @@ variable "private_endpoints" {
     - `condition` - (Optional) The condition under which the role assignment is active.
     - `condition_version` - (Optional) The version of the condition.
     - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity to assign the role to.
-    - `principal_type` - (Optional) The type of principal to assign the role to. Possible values are `\"User\"`, `\"Group\"`, `\"ServicePrincipal\"`, and `\"MSI\"`.    
+    - `principal_type` - (Optional) The type of principal to assign the role to. Possible values are `\"User\"`, `\"Group\"`, `\"ServicePrincipal\"`, and `\"MSI\"`.
   - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
