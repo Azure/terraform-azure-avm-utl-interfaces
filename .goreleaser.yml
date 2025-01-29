@@ -4,7 +4,8 @@ version: 2
 builds:
   - skip: true
 archives:
-  - format: zip
+  - formats:
+      - zip
     name_template: "{{ .ProjectName }}_{{ .Version }}"
 changelog:
   disable: false
