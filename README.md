@@ -10,7 +10,7 @@ Please see the examples for usage.
 
 ```hcl
 module "avm_interfaces" {
-  source = "Azure/avm-utl-interfaces/azure"
+  source              = "Azure/avm-utl-interfaces/azure"
   diagnostic_settings = var.diagnostic_settings
 }
 
