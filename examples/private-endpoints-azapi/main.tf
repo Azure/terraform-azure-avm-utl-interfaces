@@ -7,22 +7,19 @@ resource "random_pet" "name" {
 
 resource "azapi_resource" "rg" {
   type     = "Microsoft.Resources/resourceGroups@2024-03-01"
-  name     = "rg-${random_pet.name.id}"
   location = "australiaeast"
+  name     = "rg-${random_pet.name.id}"
 }
 
 resource "azapi_resource" "private_dns_zone" {
   type      = "Microsoft.Network/privateDnsZones@2024-06-01"
-  name      = "privatelink.vaultcore.azure.net"
   location  = "global"
+  name      = "privatelink.vaultcore.azure.net"
   parent_id = azapi_resource.rg.id
 }
 
 resource "azapi_resource" "vnet" {
-  type      = "Microsoft.Network/virtualNetworks@2024-05-01"
-  name      = "vnet-${random_pet.name.id}1"
-  location  = azapi_resource.rg.location
-  parent_id = azapi_resource.rg.id
+  type = "Microsoft.Network/virtualNetworks@2024-05-01"
   body = {
     properties = {
       addressSpace = {
@@ -38,13 +35,13 @@ resource "azapi_resource" "vnet" {
       ]
     }
   }
+  location  = azapi_resource.rg.location
+  name      = "vnet-${random_pet.name.id}1"
+  parent_id = azapi_resource.rg.id
 }
 
 resource "azapi_resource" "keyvault" {
-  type      = "Microsoft.KeyVault/vaults@2023-07-01"
-  name      = replace("kv${random_pet.name.id}2", "-", "")
-  location  = azapi_resource.rg.location
-  parent_id = azapi_resource.rg.id
+  type = "Microsoft.KeyVault/vaults@2023-07-01"
   body = {
     properties = {
       sku = {
@@ -55,6 +52,9 @@ resource "azapi_resource" "keyvault" {
       accessPolicies = []
     }
   }
+  location  = azapi_resource.rg.location
+  name      = replace("kv${random_pet.name.id}2", "-", "")
+  parent_id = azapi_resource.rg.id
 }
 
 locals {
@@ -85,18 +85,20 @@ output "private_dns_zone_groups_azapi" {
 }
 
 resource "azapi_resource" "private_endpoints" {
-  for_each  = module.avm_interfaces.private_endpoints_azapi
-  name      = each.value.name
+  for_each = module.avm_interfaces.private_endpoints_azapi
+
   type      = each.value.type
   body      = each.value.body
   location  = azapi_resource.keyvault.location
+  name      = each.value.name
   parent_id = azapi_resource.rg.id
 }
 
 resource "azapi_resource" "private_dns_zone_groups" {
-  for_each  = module.avm_interfaces.private_dns_zone_groups_azapi
-  name      = each.value.name
+  for_each = module.avm_interfaces.private_dns_zone_groups_azapi
+
   type      = each.value.type
   body      = each.value.body
+  name      = each.value.name
   parent_id = azapi_resource.private_endpoints[each.key].id
 }

@@ -11,22 +11,19 @@ resource "random_pet" "name" {
 
 resource "azapi_resource" "rg" {
   type     = "Microsoft.Resources/resourceGroups@2024-03-01"
-  name     = "rg-${random_pet.name.id}"
   location = "australiaeast"
+  name     = "rg-${random_pet.name.id}"
 }
 
 resource "azapi_resource" "private_dns_zone" {
   type      = "Microsoft.Network/privateDnsZones@2024-06-01"
-  name      = "privatelink.vaultcore.azure.net"
   location  = "global"
+  name      = "privatelink.vaultcore.azure.net"
   parent_id = azapi_resource.rg.id
 }
 
 resource "azapi_resource" "vnet" {
-  type      = "Microsoft.Network/virtualNetworks@2024-05-01"
-  name      = "vnet-${random_pet.name.id}1"
-  location  = azapi_resource.rg.location
-  parent_id = azapi_resource.rg.id
+  type = "Microsoft.Network/virtualNetworks@2024-05-01"
   body = {
     properties = {
       addressSpace = {
@@ -42,13 +39,13 @@ resource "azapi_resource" "vnet" {
       ]
     }
   }
+  location  = azapi_resource.rg.location
+  name      = "vnet-${random_pet.name.id}1"
+  parent_id = azapi_resource.rg.id
 }
 
 resource "azapi_resource" "keyvault" {
-  type      = "Microsoft.KeyVault/vaults@2023-07-01"
-  name      = replace("kv${random_pet.name.id}2", "-", "")
-  location  = azapi_resource.rg.location
-  parent_id = azapi_resource.rg.id
+  type = "Microsoft.KeyVault/vaults@2023-07-01"
   body = {
     properties = {
       sku = {
@@ -59,6 +56,16 @@ resource "azapi_resource" "keyvault" {
       accessPolicies = []
     }
   }
+  location  = azapi_resource.rg.location
+  name      = replace("kv${random_pet.name.id}2", "-", "")
+  parent_id = azapi_resource.rg.id
+}
+
+resource "azapi_resource" "asg" {
+  type      = "Microsoft.Network/applicationSecurityGroups@2024-05-01"
+  location  = azapi_resource.rg.location
+  name      = "asg-${random_pet.name.id}"
+  parent_id = azapi_resource.rg.id
 }
 
 locals {
@@ -71,38 +78,45 @@ module "avm_interfaces" {
   source = "../../"
   private_endpoints = {
     example = {
-      subnet_resource_id            = local.subnet_resource_id
-      private_dns_zone_resource_ids = [azapi_resource.private_dns_zone.id]
-      subresource_name              = "vault"
+      name                            = "pe-${azapi_resource.keyvault.name}"
+      subnet_resource_id              = local.subnet_resource_id
+      private_dns_zone_resource_ids   = [azapi_resource.private_dns_zone.id]
+      subresource_name                = "vault"
+      network_interface_name          = "nic-${azapi_resource.keyvault.name}"
+      private_service_connection_name = "psc-${azapi_resource.keyvault.name}"
+      application_security_group_associations = {
+        asg = azapi_resource.asg.id
+      }
+      ip_configurations = {
+        ipconfig1 = {
+          name               = "ipconfig"
+          private_ip_address = cidrhost(azapi_resource.vnet.output.properties.addressSpace.addressPrefixes[0], 4)
+        }
+      }
     }
   }
-  private_endpoints_scope          = azapi_resource.keyvault.id
-  role_assignment_definition_scope = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
+  private_endpoints_scope                 = azapi_resource.keyvault.id
+  private_endpoints_manage_dns_zone_group = false
+  role_assignment_definition_scope        = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
 }
 
 output "private_endpoints_azapi" {
   value = module.avm_interfaces.private_endpoints_azapi
 }
 
+# this should be empty as private_endpoints_manage_dns_zone_group is false
 output "private_dns_zone_groups_azapi" {
   value = module.avm_interfaces.private_dns_zone_groups_azapi
 }
 
 resource "azapi_resource" "private_endpoints" {
-  for_each  = module.avm_interfaces.private_endpoints_azapi
-  name      = each.value.name
+  for_each = module.avm_interfaces.private_endpoints_azapi
+
   type      = each.value.type
   body      = each.value.body
   location  = azapi_resource.keyvault.location
-  parent_id = azapi_resource.rg.id
-}
-
-resource "azapi_resource" "private_dns_zone_groups" {
-  for_each  = module.avm_interfaces.private_dns_zone_groups_azapi
   name      = each.value.name
-  type      = each.value.type
-  body      = each.value.body
-  parent_id = azapi_resource.private_endpoints[each.key].id
+  parent_id = azapi_resource.rg.id
 }
 ```
 
@@ -121,9 +135,9 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.asg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.keyvault](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_dns_zone](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.private_dns_zone_groups](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.private_endpoints](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.vnet](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
@@ -145,7 +159,7 @@ The following outputs are exported:
 
 ### <a name="output_private_dns_zone_groups_azapi"></a> [private\_dns\_zone\_groups\_azapi](#output\_private\_dns\_zone\_groups\_azapi)
 
-Description: n/a
+Description: this should be empty as private\_endpoints\_manage\_dns\_zone\_group is false
 
 ### <a name="output_private_endpoints_azapi"></a> [private\_endpoints\_azapi](#output\_private\_endpoints\_azapi)
 

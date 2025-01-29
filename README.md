@@ -1,54 +1,28 @@
 <!-- BEGIN_TF_DOCS -->
 # terraform-azure-avm-utl-interfaces
 
-This module helps module authors using AzAPI.
-It transforms the AVM interface data into AzAPI resource data.
-
-## Usage
-
-Pass in the values form your interface variables into this module, then use the output values to create the AzAPI resources.
-
-```hcl
-# Pass your AVM interface values into this module
-module "avm_interfaces" {
-  source  = "azure/avm-utl-interfaces/azure"
-  version = "" # your version here
-
-  diagnostic_settings = var.diagnostic_settings
-  # ... add more interface values here
-}
-
-# Easily create the AzAPI resources
-resource "azapi_resource" "diagnostic_settings" {
-  for_each = module.avm_interfaces.diagnostic_settings_azapi
-
-  name      = each.value.name
-  type      = each.value.type
-  body      = each.value.body
-  parent_id = azapi_resource.my_module_resource.id
-}
-```
-
-### Role Assignments
-
-In order to create the role assignments resource in an idempotent manner, you must supply the `var.role_assignment_definition_scope` value.
-For most resources this should be the subscription resource id, e.g. `/subscriptions/00000000-0000-0000-0000-000000000000`.
-However, for resources deployed at management group scope then the management group resource id should be used, e.g. `/providers/Microsoft.Management/managementGroups/myMg`.
-
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.9)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
+
+- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
+
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
 ## Resources
 
 The following resources are used by this module:
 
+- [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
+- [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [azapi_client_config.telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/resource_list) (data source)
+- [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -93,6 +67,16 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
+If it is set to false, then no telemetry will be collected.
+
+Type: `bool`
+
+Default: `true`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
@@ -128,6 +112,93 @@ object({
 ```
 
 Default: `{}`
+
+### <a name="input_private_endpoints"></a> [private\_endpoints](#input\_private\_endpoints)
+
+Description:   A map of private endpoints to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+  - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
+  - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
+    - `role_definition_id_or_name` - The ID or name of the role definition to assign.
+    - `principal_id` - The ID of the principal to assign the role to.
+    - `description` - (Optional) A description of the role assignment.
+    - `skip_service_principal_aad_check` - (Optional) Whether to skip the AAD check for service principals.
+    - `condition` - (Optional) The condition under which the role assignment is active.
+    - `condition_version` - (Optional) The version of the condition.
+    - `delegated_managed_identity_resource_id` - (Optional) The resource ID of the delegated managed identity to assign the role to.
+    - `principal_type` - (Optional) The type of principal to assign the role to. Possible values are `\"User\"`, `\"Group\"`, `\"ServicePrincipal\"`, and `\"MSI\"`.  
+  - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
+    - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+    - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+  - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
+  - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
+  - `subresource_name` - The name of the sub resource for the private endpoint.
+  - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
+  - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
+  - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+  - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
+  - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
+  - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
+  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
+  - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+    - `name` - The name of the IP configuration.
+    - `private_ip_address` - The private IP address of the IP configuration.
+
+Type:
+
+```hcl
+map(object({
+    name = optional(string, null)
+    role_assignments = optional(map(object({
+      role_definition_id_or_name             = string
+      principal_id                           = string
+      description                            = optional(string, null)
+      skip_service_principal_aad_check       = optional(bool, false)
+      condition                              = optional(string, null)
+      condition_version                      = optional(string, null)
+      delegated_managed_identity_resource_id = optional(string, null)
+      principal_type                         = optional(string, null)
+    })), {})
+    lock = optional(object({
+      kind = string
+      name = optional(string, null)
+    }), null)
+    tags                                    = optional(map(string), null)
+    subnet_resource_id                      = string
+    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)
+    private_dns_zone_group_name             = optional(string, "default")
+    private_dns_zone_resource_ids           = optional(set(string), [])
+    application_security_group_associations = optional(map(string), {})
+    private_service_connection_name         = optional(string, null)
+    network_interface_name                  = optional(string, null)
+    location                                = optional(string, null)
+    resource_group_name                     = optional(string, null)
+    ip_configurations = optional(map(object({
+      name               = string
+      private_ip_address = string
+    })), {})
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_private_endpoints_manage_dns_zone_group"></a> [private\_endpoints\_manage\_dns\_zone\_group](#input\_private\_endpoints\_manage\_dns\_zone\_group)
+
+Description: Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_private_endpoints_scope"></a> [private\_endpoints\_scope](#input\_private\_endpoints\_scope)
+
+Description: This is typically the resource ID of the resource that the private endpoint is connected to.
+
+Must be specified when `private_endpoints` are defined.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
 
@@ -198,6 +269,14 @@ Value is an object with the following attributes:
 
 - `type` - The type of Managed Identity. Possible values are `SystemAssigned`, `UserAssigned`, or `SystemAssigned, UserAssigned`.
 - `identity_ids` - A list of User Assigned Managed Identity resource IDs assigned to this resource.
+
+### <a name="output_private_dns_zone_groups_azapi"></a> [private\_dns\_zone\_groups\_azapi](#output\_private\_dns\_zone\_groups\_azapi)
+
+Description: Private DNS zone groups for the azapi\_resource.
+
+### <a name="output_private_endpoints_azapi"></a> [private\_endpoints\_azapi](#output\_private\_endpoints\_azapi)
+
+Description: Private endpoints for the azapi\_resource.
 
 ### <a name="output_role_assignments_azapi"></a> [role\_assignments\_azapi](#output\_role\_assignments\_azapi)
 

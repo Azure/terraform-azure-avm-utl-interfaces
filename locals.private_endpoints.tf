@@ -1,21 +1,32 @@
 locals {
-
-  private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
-
-  # these computed names are used if the user does not provide their own for either the private endpoint, nic, or private service connection
-  private_endpoint_computed_name = {
-    for k, v in var.private_endpoints : k => "pep-${v.subresource_name}-${uuidv5("url", format("%s", var.private_endpoints_scope))}"
-  }
-
   # if the private endpoint name is provided (var.private_endpoints.name), we use this as the suffix for the other resources
   custom_nic_computed_name = {
     for k, v in var.private_endpoints : k => v.name != null ? "nic-${v.subresource_name}-${v.name}" : "nic-${local.private_endpoint_computed_name[k]}"
   }
-
-  psc_computed_name = {
-    for k, v in var.private_endpoints : k => v.name != null ? "psc-${v.subresource_name}-${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
+  private_dns_zone_group_type = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01"
+  private_dns_zone_groups = {
+    for k, v in var.private_endpoints : k => {
+      type = local.private_dns_zone_group_type
+      name = v.private_dns_zone_group_name
+      body = {
+        properties = {
+          privateDnsZoneConfigs = [
+            for private_dns_zone_resource_id in v.private_dns_zone_resource_ids : {
+              name = lookup(v, "private_dns_zone_group_name", "default")
+              properties = {
+                privateDnsZoneId = private_dns_zone_resource_id
+              }
+            }
+          ]
+        }
+      }
+    }
+    if var.private_endpoints_manage_dns_zone_group
   }
-
+  # these computed names are used if the user does not provide their own for either the private endpoint, nic, or private service connection
+  private_endpoint_computed_name = {
+    for k, v in var.private_endpoints : k => "pep-${v.subresource_name}-${uuidv5("url", format("%s", var.private_endpoints_scope))}"
+  }
   private_endpoints = {
     for k, v in var.private_endpoints : k => {
       type = local.private_endpoints_type
@@ -55,26 +66,8 @@ locals {
       }
     }
   }
-
-  private_dns_zone_group_type = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01"
-
-  private_dns_zone_groups = {
-    for k, v in var.private_endpoints : k => {
-      type = local.private_dns_zone_group_type
-      name = v.private_dns_zone_group_name
-      body = {
-        properties = {
-          privateDnsZoneConfigs = [
-            for private_dns_zone_resource_id in v.private_dns_zone_resource_ids : {
-              name = lookup(v, "private_dns_zone_group_name", "default")
-              properties = {
-                privateDnsZoneId = private_dns_zone_resource_id
-              }
-            }
-          ]
-        }
-      }
-    }
-    if var.private_endpoints_manage_dns_zone_group
+  private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
+  psc_computed_name = {
+    for k, v in var.private_endpoints : k => v.name != null ? "psc-${v.subresource_name}-${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
   }
 }
