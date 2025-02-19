@@ -69,9 +69,22 @@ run "system_user_assigned" {
 
   variables {
     managed_identities = {
+      system_assigned = true
       user_assigned_resource_ids = [
         "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ua1",
       ]
     }
+  }
+
+  assert {
+    error_message = "Managed identity type should be SystemAssigned, UserAssigned."
+    condition     = output.managed_identities_azapi.type == "SystemAssigned, UserAssigned"
+  }
+
+  assert {
+    error_message = "Managed identity user assigned identity ids should match."
+    condition = output.managed_identities_azapi.identity_ids == toset([
+      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ua1",
+    ])
   }
 }
