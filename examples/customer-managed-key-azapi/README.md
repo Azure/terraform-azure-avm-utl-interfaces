@@ -13,14 +13,6 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 2.1"
-    }
-    modtm = {
-      source  = "azure/modtm"
-      version = "~> 0.3"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
@@ -176,10 +168,6 @@ The following requirements are needed by this module:
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
-
-- <a name="requirement_http"></a> [http](#requirement\_http) (~> 2.1)
-
-- <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 

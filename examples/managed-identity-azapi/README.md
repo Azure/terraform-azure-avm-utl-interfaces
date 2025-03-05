@@ -2,8 +2,6 @@
 # managed identity interface example
 
 ```hcl
-data "azapi_client_config" "current" {}
-
 resource "random_pet" "name" {
   length    = 2
   separator = ""
@@ -62,7 +60,6 @@ The following resources are used by this module:
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.stg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
-- [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
