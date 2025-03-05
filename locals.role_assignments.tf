@@ -32,7 +32,6 @@ locals {
   role_assignments_role_name_to_resource_id = var.role_assignment_definition_lookup_enabled && length(var.role_assignments) > 0 ? {
     for res in data.azapi_resource_list.role_definitions[0].output.results : res.role_name => res.id
   } : {}
-
   # The type and api version of the role assignments resource.
   role_assignments_type = "Microsoft.Authorization/roleAssignments@2022-04-01"
 }

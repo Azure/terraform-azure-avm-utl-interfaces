@@ -29,7 +29,6 @@ variable "role_assignment_definition_scope" {
   type        = string
   description = <<DESCRIPTION
 The scope at which the role assignments should be created.
-This is typically the resource ID of the subscription of the resource, but could also be the management group for resources deployed there.
 
 Must be specified when `role_assignments` are defined.
 DESCRIPTION

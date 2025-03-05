@@ -1,41 +1,46 @@
 <!-- BEGIN_TF_DOCS -->
-# role assignments interface example
+# managed identity interface example
 
 ```hcl
+data "azapi_client_config" "current" {}
+
 resource "random_pet" "name" {
   length    = 2
-  separator = "-"
+  separator = ""
 }
 
 resource "azapi_resource" "rg" {
   type     = "Microsoft.Resources/resourceGroups@2024-03-01"
-  location = "swedencentral"
+  location = "australiaeast"
   name     = "rg-${random_pet.name.id}"
 }
 
-# In ordinary usage, the role_assignments attribute value would be set to var.role_assignments.
+resource "azapi_resource" "stg" {
+  type = "Microsoft.Storage/storageAccounts@2023-05-01"
+  body = {
+    sku = {
+      name = "Standard_LRS"
+    }
+    kind = "StorageV2"
+  }
+  location  = azapi_resource.rg.location
+  name      = "stg${random_pet.name.id}1"
+  parent_id = azapi_resource.rg.id
+
+  identity {
+    type         = module.avm_interfaces.managed_identities_azapi.type
+    identity_ids = module.avm_interfaces.managed_identities_azapi.identity_ids
+  }
+}
+
+# In ordinary usage, the private_endpoints attribute value would be set to var.managed_identities.
 # However, in this example, we are using a data source in the same module to retrieve the object id.
 module "avm_interfaces" {
   source = "../../"
-  role_assignments = {
-    example = {
-      principal_id               = data.azapi_client_config.current.object_id
-      role_definition_id_or_name = "Storage Blob Data Owner"
-      principal_type             = "User"
-    }
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = []
   }
-  role_assignment_definition_scope = azapi_resource.rg.id
-}
-
-data "azapi_client_config" "current" {}
-
-resource "azapi_resource" "role_assignments" {
-  for_each = module.avm_interfaces.role_assignments_azapi
-
-  type      = each.value.type
-  body      = each.value.body
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
 }
 ```
 
@@ -44,7 +49,7 @@ resource "azapi_resource" "role_assignments" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.6)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.9)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
 
@@ -55,7 +60,7 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.role_assignments](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.stg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 

@@ -55,7 +55,7 @@ locals {
               name = v.private_service_connection_name != null ? v.private_service_connection_name : local.psc_computed_name[k]
               properties = {
                 privateLinkServiceId = var.private_endpoints_scope
-                groupIds             = [v.subresource_name]
+                groupIds             = v.subresource_name != null ? [v.subresource_name] : null
               }
             }
           ]

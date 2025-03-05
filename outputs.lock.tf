@@ -1,4 +1,10 @@
 output "lock_azapi" {
   value       = local.lock_azapi
-  description = "The lock data for the azapi_resource."
+  description = <<DESCRIPTION
+An object for use in azapi_resource with the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+DESCRIPTION
 }
