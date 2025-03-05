@@ -1,5 +1,3 @@
-data "azapi_client_config" "current" {}
-
 resource "random_pet" "name" {
   length    = 2
   separator = ""

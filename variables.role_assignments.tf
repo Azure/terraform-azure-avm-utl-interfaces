@@ -28,7 +28,7 @@ DESCRIPTION
 variable "role_assignment_definition_scope" {
   type        = string
   description = <<DESCRIPTION
-The scope at which the role assignments should be created.
+The scope at which the role assignments should be created. Used to look up role definitions by role name.
 
 Must be specified when `role_assignments` are defined.
 DESCRIPTION

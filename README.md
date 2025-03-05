@@ -279,7 +279,7 @@ Default: `true`
 
 ### <a name="input_role_assignment_definition_scope"></a> [role\_assignment\_definition\_scope](#input\_role\_assignment\_definition\_scope)
 
-Description: The scope at which the role assignments should be created.
+Description: The scope at which the role assignments should be created. Used to look up role definitions by role name.
 
 Must be specified when `role_assignments` are defined.
 
