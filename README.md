@@ -61,6 +61,7 @@ The following resources are used by this module:
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.customer_managed_key_identity](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/resource_list) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
@@ -72,6 +73,39 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key)
+
+Description: An object containing the following attributes:
+
+- `key_vault_resource_id` - The resource ID of the key vault.
+- `key_name` - The name of the key.
+- `key_version` - (Optional) The version of the key. If not provided, the latest version will be used.
+- `user_assigned_identity` - (Optional) An object containing the resource ID of the user assigned identity.
+  - `resource_id` - The resource ID of the user assigned identity.
+
+Type:
+
+```hcl
+object({
+    key_vault_resource_id = string
+    key_name              = string
+    key_version           = optional(string, null)
+    user_assigned_identity = optional(object({
+      resource_id = string
+    }), null)
+  })
+```
+
+Default: `null`
+
+### <a name="input_customer_managed_key_key_vault_domain"></a> [customer\_managed\_key\_key\_vault\_domain](#input\_customer\_managed\_key\_key\_vault\_domain)
+
+Description: The domain name for the key vault. Default is `vault.azure.net`.
+
+Type: `string`
+
+Default: `"vault.azure.net"`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
@@ -205,7 +239,7 @@ map(object({
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
-    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)
+    subresource_name                        = optional(string, null)
     private_dns_zone_group_name             = optional(string, "default")
     private_dns_zone_resource_ids           = optional(set(string), [])
     application_security_group_associations = optional(map(string), {})
@@ -251,8 +285,7 @@ Default: `true`
 
 ### <a name="input_role_assignment_definition_scope"></a> [role\_assignment\_definition\_scope](#input\_role\_assignment\_definition\_scope)
 
-Description: The scope at which the role assignments should be created.  
-This is typically the resource ID of the subscription of the resource, but could also be the management group for resources deployed there.
+Description: The scope at which the role assignments should be created. Used to look up role definitions by role name.
 
 Must be specified when `role_assignments` are defined.
 
@@ -294,13 +327,36 @@ Default: `{}`
 
 The following outputs are exported:
 
+### <a name="output_customer_managed_key_azapi"></a> [customer\_managed\_key\_azapi](#output\_customer\_managed\_key\_azapi)
+
+Description: An object containing the following attributes:
+
+- `identity_client_id` - The client ID of the user-assigned identity. Will be null if no user-assigned identity is provided.
+- `identity_principal_id` - The principal ID of the user-assigned identity. Will be null if no user-assigned identity is provided.
+- `identity_tenant_id` - The tenant ID of the user-assigned identity. Will be null if no user-assigned identity is provided.
+- `key_name` - The name of the key. Will be null if no key is provided.
+- `key_resource_id` - The resource ID of the key, including the version. If the key version is not provided, this will be null.
+- `key_uri` - The URI of the key, including the version. If the key version is not provided, this will be null.
+- `key_vault_uri` - The URI of the key vault.
+- `key_version` - The version of the key. Will be null if no key is provided.
+- `versionless_key_resource_id` - The resource ID of the key, without the version.
+- `versionless_key_uri` - The URI of the key, without the version.
+
 ### <a name="output_diagnostic_settings_azapi"></a> [diagnostic\_settings\_azapi](#output\_diagnostic\_settings\_azapi)
 
-Description: A map of the diagnostic settings resource data for use with azapi.
+Description: A map of diagnostic settings for use in azapi\_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
 
 ### <a name="output_lock_azapi"></a> [lock\_azapi](#output\_lock\_azapi)
 
-Description: The lock data for the azapi\_resource.
+Description: An object for use in azapi\_resource with the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
 
 ### <a name="output_managed_identities_azapi"></a> [managed\_identities\_azapi](#output\_managed\_identities\_azapi)
 
@@ -312,15 +368,28 @@ Value is an object with the following attributes:
 
 ### <a name="output_private_dns_zone_groups_azapi"></a> [private\_dns\_zone\_groups\_azapi](#output\_private\_dns\_zone\_groups\_azapi)
 
-Description: Private DNS zone groups for the azapi\_resource.
+Description: A map of private DNS zone groups for use with azapi\_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
 
 ### <a name="output_private_endpoints_azapi"></a> [private\_endpoints\_azapi](#output\_private\_endpoints\_azapi)
 
-Description: Private endpoints for the azapi\_resource.
+Description: A map of private endpoints for use with azapi\_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+- `tags` - The tags of the resource.
 
 ### <a name="output_role_assignments_azapi"></a> [role\_assignments\_azapi](#output\_role\_assignments\_azapi)
 
-Description: A map of the role assignments resource data for use with azapi.
+Description: A map of role assignments for use in azapi\_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
 
 ## Modules
 

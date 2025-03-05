@@ -21,11 +21,10 @@ module "avm_interfaces" {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Storage Blob Data Owner"
-      scope                      = azapi_resource.rg.id
       principal_type             = "User"
     }
   }
-  role_assignment_definition_scope = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
+  role_assignment_definition_scope = azapi_resource.rg.id
 }
 
 data "azapi_client_config" "current" {}

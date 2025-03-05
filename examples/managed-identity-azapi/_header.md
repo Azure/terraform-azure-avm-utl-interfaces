@@ -1,0 +1,1 @@
+# managed identity interface example

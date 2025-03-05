@@ -1,4 +1,10 @@
 output "diagnostic_settings_azapi" {
-  description = "A map of the diagnostic settings resource data for use with azapi."
   value       = local.diagnostic_settings_azapi
+  description = <<DESCRIPTION
+A map of diagnostic settings for use in azapi_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+DESCRIPTION
 }
