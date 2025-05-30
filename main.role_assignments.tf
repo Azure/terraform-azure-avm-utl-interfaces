@@ -9,3 +9,8 @@ data "azapi_resource_list" "role_definitions" {
     results = "value[].{id: id, role_name: properties.roleName}"
   }
 }
+
+#  Use a random UUID for the role assignment name if the variable is set to true.
+resource "random_uuid" "role_assignment_name" {
+  for_each = var.role_assignment_name_use_random_uuid ? var.role_assignments : {}
+}
