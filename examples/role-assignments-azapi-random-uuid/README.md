@@ -1,44 +1,45 @@
 <!-- BEGIN_TF_DOCS -->
 # role assignments interface example
 
-```hcl
-data "azapi_client_config" "current" {}
+This example uses random\_uuid to generate unique role assignment names.
+This is useful when the deterministic is generated using unknown values and could cause needless re-creation of the role assignment.
 
+```hcl
 resource "random_pet" "name" {
   length    = 2
   separator = "-"
 }
 
 resource "azapi_resource" "rg" {
-  location  = "swedencentral"
-  name      = "rg-${random_pet.name.id}"
-  parent_id = data.azapi_client_config.current.subscription_resource_id
-  type      = "Microsoft.Resources/resourceGroups@2024-03-01"
-  retry = {
-    error_message_regex  = ["ScopeLocked"]
-    interval_seconds     = 15
-    max_interval_seconds = 60
-  }
-
-  timeouts {
-    delete = "5m"
-  }
+  location = "swedencentral"
+  name     = "rg-${random_pet.name.id}"
+  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
 }
 
-# In ordinary usage, the lock attribute value would be set to var.lock.
+# In ordinary usage, the role_assignments attribute value would be set to var.role_assignments.
+# However, in this example, we are using a data source in the same module to retrieve the object id.
 module "avm_interfaces" {
   source = "../../"
 
-  lock = {
-    kind = "CanNotDelete"
+  role_assignment_definition_scope = azapi_resource.rg.id
+  role_assignments = {
+    example = {
+      principal_id               = data.azapi_client_config.current.object_id
+      role_definition_id_or_name = "Storage Blob Data Owner"
+      principal_type             = "User"
+    }
   }
 }
 
-resource "azapi_resource" "lock" {
-  name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : "lock-${azapi_resource.rg.name}"
+data "azapi_client_config" "current" {}
+
+resource "azapi_resource" "role_assignments" {
+  for_each = module.avm_interfaces.role_assignments_azapi
+
+  name      = each.value.name
   parent_id = azapi_resource.rg.id
-  type      = module.avm_interfaces.lock_azapi.type
-  body      = module.avm_interfaces.lock_azapi.body
+  type      = each.value.type
+  body      = each.value.body
 }
 ```
 
@@ -57,8 +58,8 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.lock](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 

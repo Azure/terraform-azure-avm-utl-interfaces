@@ -32,6 +32,9 @@ though this can cause issues with duplicate UUIDs as the scope of the role assig
 
 This is default to false to preserve existing behaviour.
 However, we recommend this is set to true to avoid resources becoming re-created due to computed attribute changes in the resource graph.
+
+When this is set to true, you must not change the principal or role definition values in the `role_assignments` map after the initial creation of the role assignments as this will cause errors.
+Instead, use a new key in the map with the new values and remove the old entry.
 DESCRIPTION
   nullable    = false
 }
