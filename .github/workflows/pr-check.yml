@@ -10,7 +10,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checking for Fork
+      - name: checking for fork
         shell: pwsh
         run: |
           $isFork = "${{ github.event.pull_request.head.repo.fork }}"
@@ -21,7 +21,7 @@ jobs:
   run-managed-workflow:
     if: github.event.pull_request.head.repo.fork == false
     uses: Azure/avm-terraform-governance/.github/workflows/pr-check-template.yml@main
-    name: Run managed workflow
+    name: run managed workflow
     secrets: inherit
     permissions:
       id-token: write
