@@ -1,13 +1,16 @@
 locals {
   # Create a map of role assignment names based on the principal ID and role definition resource ID.
   role_assignment_deterministic_name = {
-    for k, v in var.role_assignments : k => uuidv5("url", format("%s%s", v.principal_id, local.role_assignments_role_name_to_resource_id[v.role_definition_id_or_name]))
+    for k, v in var.role_assignments : k => {
+      # mimic the random_uuid attribute value
+      result = uuidv5("url", format("%s%s", v.principal_id, local.role_assignments_role_name_to_resource_id[v.role_definition_id_or_name]))
+    }
   }
   # Here is the role assignment data for the azapi_resource.
   role_assignments_azapi = {
     for k, v in var.role_assignments : k => {
       type = local.role_assignments_type
-      name = lookup(resource.random_uuid.role_assignment_name, k, local.role_assignment_deterministic_name[k])
+      name = lookup(resource.random_uuid.role_assignment_name, k, local.role_assignment_deterministic_name[k]).result
       body = {
         properties = {
           principalId                        = v.principal_id
