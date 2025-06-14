@@ -21,7 +21,8 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
-  role_assignment_definition_scope = azapi_resource.rg.id
+  role_assignment_definition_scope     = azapi_resource.rg.id
+  role_assignment_name_use_random_uuid = true
   role_assignments = {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
