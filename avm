@@ -39,6 +39,8 @@ if [ -z "$AVM_IN_CONTAINER" ]; then
     -e FORCE_COLOR \
     -e GITHUB_TOKEN \
     -e NO_COLOR \
+    -e PORCH_LOG_LEVEL \
+    -e TEST_TYPE \
     ghcr.io/azure/avm-terraform-governance:latest \
     make \
     "$1"
