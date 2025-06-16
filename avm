@@ -23,6 +23,13 @@ if [ -z "$AZURE_CONFIG_DIR" ]; then
   AZURE_CONFIG_DIR="$HOME/.azure"
 fi
 
+# If we are not in GitHub Actions, we want to use TUI and interactive mode
+if [ -z "$GITHUB_RUN_ID" ]; then
+  TUI="--tui"
+  DOCKER_INTERACTIVE="-it"
+  export FORCE_COLOR=1
+fi
+
 # Check if we are running in a container
 # If we are then just run make directly
 if [ -z "$AVM_IN_CONTAINER" ]; then
@@ -30,6 +37,7 @@ if [ -z "$AVM_IN_CONTAINER" ]; then
     --pull always \
     --user "$(id -u):$(id -g)" \
     --rm \
+    $DOCKER_INTERACTIVE \
     -v "$(pwd)":/src \
     -v $AZURE_CONFIG_DIR:/azureconfig \
     -e ARM_CLIENT_ID \
@@ -43,7 +51,8 @@ if [ -z "$AVM_IN_CONTAINER" ]; then
     -e TEST_TYPE \
     ghcr.io/azure/avm-terraform-governance:latest \
     make \
+    TUI="$TUI" \
     "$1"
 else
-  make "$1"
+  make TUI="$TUI" "$1"
 fi
