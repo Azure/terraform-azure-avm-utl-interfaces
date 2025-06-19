@@ -1,6 +1,0 @@
-name: test
-commands:
-  - type: copycwdtotemp
-  - type: shell
-    name: pwd
-    command_line: echo $(pwd) 1>&2 && exit 1
