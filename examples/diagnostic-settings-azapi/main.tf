@@ -75,8 +75,9 @@ module "avm_interfaces" {
   diagnostic_settings = {
     example = {
       name                           = "tolaw"
-      log_groups                     = ["allLogs"]
-      metric_categories              = ["AllMetrics"]
+      metric_categories              = ["Capacity", "Transaction"]
+      log_categories                 = []
+      log_groups                     = []
       log_analytics_destination_type = "Dedicated"
       workspace_resource_id          = azapi_resource.law.id
     }
