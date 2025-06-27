@@ -22,6 +22,6 @@ DESCRIPTION
 variable "customer_managed_key_key_vault_domain" {
   type        = string
   default     = "vault.azure.net"
-  nullable    = false
   description = "The domain name for the key vault. Default is `vault.azure.net`."
+  nullable    = false
 }

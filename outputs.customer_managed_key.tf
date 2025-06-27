@@ -1,16 +1,4 @@
 output "customer_managed_key_azapi" {
-  value = {
-    identity_client_id          = local.customer_managed_key_identity_client_id
-    identity_principal_id       = local.customer_managed_key_identity_principal_id
-    identity_tenant_id          = local.customer_managed_key_identity_tenant_id
-    key_name                    = local.customer_managed_key_key_name
-    key_resource_id             = local.customer_managed_key_key_resource_id
-    key_uri                     = local.customer_managed_key_key_uri
-    key_vault_uri               = local.customer_managed_key_key_vault_uri
-    key_version                 = local.customer_managed_key_key_version
-    versionless_key_resource_id = local.customer_managed_key_versionless_key_resource_id
-    versionless_key_uri         = local.customer_managed_key_versionless_key_uri
-  }
   description = <<DESCRIPTION
 An object containing the following attributes:
 
@@ -25,4 +13,16 @@ An object containing the following attributes:
 - `versionless_key_resource_id` - The resource ID of the key, without the version.
 - `versionless_key_uri` - The URI of the key, without the version.
 DESCRIPTION
+  value = {
+    identity_client_id          = local.customer_managed_key_identity_client_id
+    identity_principal_id       = local.customer_managed_key_identity_principal_id
+    identity_tenant_id          = local.customer_managed_key_identity_tenant_id
+    key_name                    = local.customer_managed_key_key_name
+    key_resource_id             = local.customer_managed_key_key_resource_id
+    key_uri                     = local.customer_managed_key_key_uri
+    key_vault_uri               = local.customer_managed_key_key_vault_uri
+    key_version                 = local.customer_managed_key_key_version
+    versionless_key_resource_id = local.customer_managed_key_versionless_key_resource_id
+    versionless_key_uri         = local.customer_managed_key_versionless_key_uri
+  }
 }
