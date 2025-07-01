@@ -24,6 +24,7 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
 data "azapi_client_config" "current" {}
 
 ## Section to provide a random Azure region for the resource group
@@ -101,7 +102,7 @@ module "key_vault" {
     admin = {
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Key Vault Administrator"
-      principal_type             = "User"
+      principal_type             = var.user_principal_type
     }
   }
 }
@@ -201,6 +202,14 @@ Description: Enable telemetry for the module
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+
+Description: This is so we can set the correct value in the CI/CD pipeline. In a real-world scenario, this would be set to 'User' or 'ServicePrincipal' based on the principal type you are assigning the role to.
+
+Type: `string`
+
+Default: `"User"`
 
 ## Outputs
 

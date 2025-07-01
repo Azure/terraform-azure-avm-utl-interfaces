@@ -1,9 +1,3 @@
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = "Enable telemetry for the module"
-}
-
 variable "user_principal_type" {
   type        = string
   default     = "User"
