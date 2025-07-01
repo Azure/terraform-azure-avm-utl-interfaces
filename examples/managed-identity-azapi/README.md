@@ -20,7 +20,7 @@ resource "azapi_resource" "stg" {
   type      = "Microsoft.Storage/storageAccounts@2023-05-01"
   body = {
     sku = {
-      name = "Standard_ZRS"
+      name = "Standard_LRS"
     }
     kind = "StorageV2"
   }
