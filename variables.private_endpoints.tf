@@ -31,7 +31,6 @@ variable "private_endpoints" {
     })), {})
   }))
   default     = {}
-  nullable    = false
   description = <<DESCRIPTION
   A map of private endpoints to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
@@ -62,23 +61,24 @@ variable "private_endpoints" {
     - `name` - The name of the IP configuration.
     - `private_ip_address` - The private IP address of the IP configuration.
   DESCRIPTION
+  nullable    = false
 }
 
 variable "private_endpoints_manage_dns_zone_group" {
   type        = bool
   default     = true
-  nullable    = false
   description = "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
+  nullable    = false
 }
 
 variable "private_endpoints_scope" {
   type        = string
+  default     = null
   description = <<DESCRIPTION
 This is typically the resource ID of the resource that the private endpoint is connected to.
 
 Must be specified when `private_endpoints` are defined.
 DESCRIPTION
-  default     = null
 
   validation {
     condition     = length(var.private_endpoints) > 0 ? var.private_endpoints_scope != null : true

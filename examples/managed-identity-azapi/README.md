@@ -8,22 +8,22 @@ resource "random_pet" "name" {
 }
 
 resource "azapi_resource" "rg" {
-  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
   location = "australiaeast"
   name     = "rg-${random_pet.name.id}"
+  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
 }
 
 resource "azapi_resource" "stg" {
-  type = "Microsoft.Storage/storageAccounts@2023-05-01"
-  body = {
-    sku = {
-      name = "Standard_LRS"
-    }
-    kind = "StorageV2"
-  }
   location  = azapi_resource.rg.location
   name      = "stg${random_pet.name.id}1"
   parent_id = azapi_resource.rg.id
+  type      = "Microsoft.Storage/storageAccounts@2023-05-01"
+  body = {
+    sku = {
+      name = "Standard_ZRS"
+    }
+    kind = "StorageV2"
+  }
 
   identity {
     type         = module.avm_interfaces.managed_identities_azapi.type
@@ -35,6 +35,7 @@ resource "azapi_resource" "stg" {
 # However, in this example, we are using a data source in the same module to retrieve the object id.
 module "avm_interfaces" {
   source = "../../"
+
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = []

@@ -51,3 +51,4 @@ avm.tflint_module.merged.hcl
 dist/**
 examples/*/policy
 *.mptfbackup
+.avm
