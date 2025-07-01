@@ -151,7 +151,7 @@ resource "azapi_resource" "storage" {
       supportsHttpsTrafficOnly = true
     }
     sku = {
-      name = "Standard_LRS"
+      name = "Standard_ZRS"
     }
   }
 

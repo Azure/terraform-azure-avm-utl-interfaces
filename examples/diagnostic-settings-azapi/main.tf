@@ -62,7 +62,7 @@ resource "azapi_resource" "stg" {
       supportsHttpsTrafficOnly = true
     }
     sku = {
-      name = "Standard_LRS"
+      name = "Standard_ZRS"
     }
   }
 }
