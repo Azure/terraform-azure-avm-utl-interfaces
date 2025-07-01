@@ -76,12 +76,12 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
-  diagnostic_settings = {
+  diagnostic_settings_v2 = {
     example = {
-      name                           = "tolaw"
-      metric_categories              = ["Capacity", "Transaction"]
-      log_categories                 = []
-      log_groups                     = []
+      name = "tolaw"
+      logs = [{
+        category_group = "audit"
+      }]
       log_analytics_destination_type = "Dedicated"
       workspace_resource_id          = azapi_resource.law.id
     }
