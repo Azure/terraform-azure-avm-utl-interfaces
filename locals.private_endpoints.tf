@@ -30,7 +30,7 @@ locals {
   private_endpoints = {
     for k, v in var.private_endpoints : k => {
       type = local.private_endpoints_type
-      name = v.name != null ? v.name : local.private_endpoint_computed_name[k]
+      name = coalesce(v.name, local.private_endpoint_computed_name[k])
       tags = v.tags
       body = {
         properties = {
@@ -68,6 +68,6 @@ locals {
   }
   private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
   psc_computed_name = {
-    for k, v in var.private_endpoints : k => v.name != null ? "psc-${v.subresource_name}-${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
+    for k, v in var.private_endpoints : k => v.name != null ? "psc-${try("${v.subresource_name}-", "")}${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
   }
 }
