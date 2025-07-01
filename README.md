@@ -59,6 +59,7 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
+- [random_uuid.role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_resource.customer_managed_key_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
@@ -130,6 +131,55 @@ map(object({
     log_categories                           = optional(set(string), [])
     log_groups                               = optional(set(string), ["allLogs"])
     metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_diagnostic_settings_v2"></a> [diagnostic\_settings\_v2](#input\_diagnostic\_settings\_v2)
+
+Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+  This is a preview of the new diagnostic settings interface, which fully supports all features of the Azure Diagnostic Settings API.
+
+  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `logs` - (Optional) A set of log groups to send to the log analytics workspace.
+  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+  - `metrics` - (Optional) A set of metric categories to send to the log analytics workspace.
+  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+
+Type:
+
+```hcl
+map(object({
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
     log_analytics_destination_type           = optional(string, "Dedicated")
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
@@ -293,9 +343,27 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_role_assignment_name_use_random_uuid"></a> [role\_assignment\_name\_use\_random\_uuid](#input\_role\_assignment\_name\_use\_random\_uuid)
+
+Description: A control to use a random UUID for the role assignment name.  
+If set to false, the name will be a deterministic UUID based on the principal ID and role definition resource ID,  
+though this can cause issues with duplicate UUIDs as the scope of the role assignment is not taken into account.
+
+This is default to false to preserve existing behaviour.  
+However, we recommend this is set to true to avoid resources becoming re-created due to computed attribute changes in the resource graph.
+
+When this is set to true, you must not change the principal or role definition values in the `role_assignments` map after the initial creation of the role assignments as this will cause errors.  
+Instead, use a new key in the map with the new values and remove the old entry.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
-Description:   A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+Description:   A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
+  Do not change principal or role definition values in this map after the initial creation of the role assignments as this will cause errors.  
+  Instead, add a new entry to the map with a new key and remove the old entry.
 
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
@@ -343,6 +411,14 @@ Description: An object containing the following attributes:
 - `versionless_key_uri` - The URI of the key, without the version.
 
 ### <a name="output_diagnostic_settings_azapi"></a> [diagnostic\_settings\_azapi](#output\_diagnostic\_settings\_azapi)
+
+Description: A map of diagnostic settings for use in azapi\_resource, the value is an object containing the following attributes:
+
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+
+### <a name="output_diagnostic_settings_azapi_v2"></a> [diagnostic\_settings\_azapi\_v2](#output\_diagnostic\_settings\_azapi\_v2)
 
 Description: A map of diagnostic settings for use in azapi\_resource, the value is an object containing the following attributes:
 
