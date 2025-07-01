@@ -1,0 +1,17 @@
+{
+  "servers": {
+    "terraform-mcp-server": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ],
+      "cwd": "${workspaceFolder}",
+      "env": {}
+    }
+  },
+  "inputs": []
+}
