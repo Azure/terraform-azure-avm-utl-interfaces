@@ -25,7 +25,7 @@ locals {
   }
   # these computed names are used if the user does not provide their own for either the private endpoint, nic, or private service connection
   private_endpoint_computed_name = {
-    for k, v in var.private_endpoints : k => "pep-${coalesce(v.subresource_name, k)}-${uuidv5("url", format("%s", var.private_endpoints_scope))}"
+    for k, v in var.private_endpoints : k => "pep-${try("${v.subresource_name}-", "")}${uuidv5("url", format("%s", var.private_endpoints_scope))}"
   }
   private_endpoints = {
     for k, v in var.private_endpoints : k => {
