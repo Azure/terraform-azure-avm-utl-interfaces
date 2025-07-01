@@ -68,6 +68,6 @@ locals {
   }
   private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
   psc_computed_name = {
-    for k, v in var.private_endpoints : k => v.name != null ? "psc-${try("${v.subresource_name}-", "")}${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
+    for k, v in var.private_endpoints : k => v.name != null ? "pcon-${try("${v.subresource_name}-", "")}${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
   }
 }
