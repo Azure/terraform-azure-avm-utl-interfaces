@@ -24,6 +24,7 @@ resource "modtm_telemetry" "telemetry" {
   }, { location = local.main_location })
 
 
+
 }
 locals {
   main_location = "unknown"
@@ -41,6 +42,7 @@ locals {
   })
 
 
+
 }
 
 locals {
@@ -54,6 +56,7 @@ locals {
     "git::https://github\\.com/[A|a]zure/.+",
     "git::ssh:://git@github\\.com/[A|a]zure/.+",
   ]
+
 
 
 }
