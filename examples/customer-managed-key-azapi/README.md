@@ -101,7 +101,6 @@ module "key_vault" {
     admin = {
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Key Vault Administrator"
-      principal_type             = "User"
     }
   }
 }
