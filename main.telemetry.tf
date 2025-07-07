@@ -23,6 +23,7 @@ resource "modtm_telemetry" "telemetry" {
     random_id       = one(random_uuid.telemetry).result
   }, { location = local.main_location })
 
+
 }
 locals {
   main_location = "unknown"
@@ -39,6 +40,7 @@ locals {
     avm_module_version = one(data.modtm_module_source.telemetry).module_version
   })
 
+
 }
 
 locals {
@@ -52,6 +54,7 @@ locals {
     "git::https://github\\.com/[A|a]zure/.+",
     "git::ssh:://git@github\\.com/[A|a]zure/.+",
   ]
+
 
 }
 

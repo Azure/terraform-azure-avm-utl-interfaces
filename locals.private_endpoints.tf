@@ -1,7 +1,7 @@
 locals {
   # if the private endpoint name is provided (var.private_endpoints.name), we use this as the suffix for the other resources
   custom_nic_computed_name = {
-    for k, v in var.private_endpoints : k => v.name != null ? "nic-${v.subresource_name}-${v.name}" : "nic-${local.private_endpoint_computed_name[k]}"
+    for k, v in var.private_endpoints : k => v.name != null ? "nic-${coalesce(v.subresource_name, k)}-${v.name}" : "nic-${local.private_endpoint_computed_name[k]}"
   }
   private_dns_zone_group_type = "Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01"
   private_dns_zone_groups = {
@@ -68,6 +68,6 @@ locals {
   }
   private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
   psc_computed_name = {
-    for k, v in var.private_endpoints : k => v.name != null ? "psc-${v.subresource_name}-${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
+    for k, v in var.private_endpoints : k => v.name != null ? "psc-${coalesce(v.subresource_name, k)}-${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
   }
 }
