@@ -27,6 +27,7 @@ module "avm_interfaces" {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Storage Blob Data Owner"
+      principal_type             = "ServicePrincipal"
     }
   }
 }
