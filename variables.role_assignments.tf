@@ -15,11 +15,6 @@ The scope at which the role assignments should be created. Used to look up role 
 
 Must be specified when `role_assignments` are defined.
 DESCRIPTION
-
-  validation {
-    condition     = length(var.role_assignments) > 0 ? var.role_assignment_definition_scope != null : true
-    error_message = "The role_assignment_definition_scope variable must be set when role_assignments are defined."
-  }
 }
 
 variable "role_assignment_name_use_random_uuid" {
