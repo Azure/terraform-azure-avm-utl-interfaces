@@ -15,11 +15,6 @@ The scope at which the role assignments should be created. Used to look up role 
 
 Must be specified when `role_assignments` are defined.
 DESCRIPTION
-
-  validation {
-    condition     = length(var.role_assignments) > 0 ? var.role_assignment_definition_scope != null : true
-    error_message = "The role_assignment_definition_scope variable must be set when role_assignments are defined."
-  }
 }
 
 variable "role_assignment_name_use_random_uuid" {
@@ -66,4 +61,9 @@ variable "role_assignments" {
   - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
 DESCRIPTION
   nullable    = false
+
+  validation {
+    error_message = "If role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
+    condition     = length(var.role_assignments) > 0 && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
+  }
 }

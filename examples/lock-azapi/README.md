@@ -40,6 +40,14 @@ resource "azapi_resource" "lock" {
   type      = module.avm_interfaces.lock_azapi.type
   body      = module.avm_interfaces.lock_azapi.body
 }
+
+# To avoid issues with the idempotency check, we add a sleep resource.
+# This is not necessary in production code, but it helps to avoid issues in this example.
+resource "time_sleep" "wait_for_lock" {
+  create_duration = "20s"
+
+  depends_on = [azapi_resource.lock]
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -53,6 +61,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
+- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.13)
+
 ## Resources
 
 The following resources are used by this module:
@@ -60,6 +70,7 @@ The following resources are used by this module:
 - [azapi_resource.lock](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
+- [time_sleep.wait_for_lock](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->

@@ -60,6 +60,7 @@ The following resources are used by this module:
 
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [random_uuid.role_assignment_name_private_endpoint](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_resource.customer_managed_key_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
@@ -434,6 +435,17 @@ Description: An object for use in azapi\_resource with the following attributes:
 - `name` - The name of the resource.
 - `body` - The body of the resource.
 
+### <a name="output_lock_private_endpoint_azapi"></a> [lock\_private\_endpoint\_azapi](#output\_lock\_private\_endpoint\_azapi)
+
+Description: A flattened map of objects containing for use in azapi\_resource with the following attributes:
+
+- `pe_key` - The key of the private endpoint, used to look up the parent id.
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+
+These locks should be used for private endpoints defined in var.private\_endpoints.
+
 ### <a name="output_managed_identities_azapi"></a> [managed\_identities\_azapi](#output\_managed\_identities\_azapi)
 
 Description: The Managed Identity configuration for the azapi\_resource.  
@@ -466,6 +478,18 @@ Description: A map of role assignments for use in azapi\_resource, the value is 
 - `type` - The type of the resource.
 - `name` - The name of the resource.
 - `body` - The body of the resource.
+
+### <a name="output_role_assignments_private_endpoint_azapi"></a> [role\_assignments\_private\_endpoint\_azapi](#output\_role\_assignments\_private\_endpoint\_azapi)
+
+Description: A flattened map of role assignments for private endpoints, the value is an object containing the following attributes:
+
+- `pe_key` - The key of the private endpoint, used to look up the parent id.
+- `assignment_key` - The key of the role assignment from the private endpoint object map.
+- `type` - The type of the resource.
+- `name` - The name of the resource.
+- `body` - The body of the resource.
+
+These role assignments should be used for private endpoints defined in var.private\_endpoints.
 
 ## Modules
 

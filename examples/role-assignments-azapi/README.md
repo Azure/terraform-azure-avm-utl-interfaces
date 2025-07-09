@@ -2,6 +2,7 @@
 # role assignments interface example
 
 ```hcl
+
 resource "random_pet" "name" {
   length    = 2
   separator = "-"
@@ -23,7 +24,7 @@ module "avm_interfaces" {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Storage Blob Data Owner"
-      principal_type             = "ServicePrincipal"
+      principal_type             = var.user_principal_type
     }
   }
 }
@@ -67,7 +68,15 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+
+Description: This is so we can set the correct value in the CI/CD pipeline. In a real-world scenario, this would be set to 'User' or 'ServicePrincipal' based on the principal type you are assigning the role to.
+
+Type: `string`
+
+Default: `"User"`
 
 ## Outputs
 
