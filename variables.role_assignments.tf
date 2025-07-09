@@ -69,6 +69,6 @@ DESCRIPTION
 
   validation {
     error_message = "If role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
-    condition     = var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
+    condition     = length(var.role_assignments) > 0 && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
   }
 }
