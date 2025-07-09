@@ -66,4 +66,9 @@ variable "role_assignments" {
   - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
 DESCRIPTION
   nullable    = false
+
+  validation {
+    error_message = "If role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
+    condition     = var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
+  }
 }

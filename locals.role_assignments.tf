@@ -1,11 +1,18 @@
 locals {
-  # Create a map of role assignment names based on the principal ID and role definition resource ID.
+  # Should we use the role assignment definition lookup data source?
+  role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled && (
+    length(var.role_assignments) > 0 || length(local.role_assignments_private_endpoint_azapi_keys_only) > 0
+  )
+  # This is the deterministic name for role assignments.
+  # It is no longer recommended to use this but left in place for backwards compatibility.
   role_assignment_deterministic_name = {
     for k, v in var.role_assignments : k => {
       # mimic the random_uuid attribute value
       result = uuidv5("url", format("%s%s", v.principal_id, local.role_assignments_role_name_to_resource_id[v.role_definition_id_or_name]))
     }
   }
+  # This is the deterministic name for role assignments for private endpoints.
+  # It is no longer recommended to use this but left in place for backwards compatibility.
   role_assignment_private_endpoint_deterministic_name = {
     for k, v in local.role_assignments_private_endpoint_azapi_keys_only : k => {
       # mimic the random_uuid attribute value
@@ -34,6 +41,8 @@ locals {
       }
     }
   }
+  # The role assignments for private endpoints.
+  # We reference the variable to avoid cycle errors.
   role_assignments_private_endpoint_azapi = {
     for k, v in local.role_assignments_private_endpoint_azapi_keys_only : k => {
       pe_key         = v.pe_key
@@ -68,6 +77,7 @@ locals {
       assignment_key = pe_assignment.assignment_key
     }
   }
+  # Create a map of role definition resource ids for each role assignment for private endpoints.
   role_assignments_private_endpoint_role_definition_resource_ids = {
     for k, v in local.role_assignments_private_endpoint_azapi_keys_only : k => lookup(
       local.role_assignments_role_name_to_resource_id,
@@ -76,9 +86,6 @@ locals {
     )
   }
   # Create a map of role definition resource ids for each role assignment.
-  # We do this because we use this information more than once.
-  # Firstly in the roleDefinitionId property of the role assignment,
-  # and secondly as part of the deterministic UUID name property of the role assignment.
   role_assignments_role_definition_resource_ids = {
     for k, v in var.role_assignments : k => lookup(
       local.role_assignments_role_name_to_resource_id,

@@ -8,6 +8,9 @@ locals {
       }
     }
   } : null
+  # Create a map of private endpoint locks.
+  # There can only be one lock per private endpoint,
+  # so we use the private endpoint key as the key in the map.
   lock_private_endpoint_azapi = {
     for pe_key, pe_val in var.private_endpoints : pe_key => {
       pe_key = pe_key

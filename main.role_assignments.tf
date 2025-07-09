@@ -1,7 +1,7 @@
 # This resource allows us to look up role definitions by role name.
 # The AzureRM provider does this already so we are replicating this functionality here to benefit AzAPI users.
 data "azapi_resource_list" "role_definitions" {
-  count = var.role_assignment_definition_lookup_enabled ? 1 : 0
+  count = local.role_assignment_definition_lookup_enabled ? 1 : 0
 
   parent_id = var.role_assignment_definition_scope
   type      = "Microsoft.Authorization/roleDefinitions@2022-04-01"
@@ -10,12 +10,16 @@ data "azapi_resource_list" "role_definitions" {
   }
 }
 
-#  Use a random UUID for the role assignment name if the variable is set to true.
+# Use a random UUID for the role assignment name if the variable is set to true.
+# This is the recommended way to create role assignment names to avoid issues with duplicate UUIDs
+# and unknown values causing replacement, e.g. principal ID.
 resource "random_uuid" "role_assignment_name" {
   for_each = var.role_assignment_name_use_random_uuid ? var.role_assignments : {}
 }
 
-#  Use a random UUID for the role assignment name if the variable is set to true.
+# Use a random UUID for the role assignment name if the variable is set to true.
+# This is the recommended way to create role assignment names to avoid issues with duplicate UUIDs
+# and unknown values causing replacement, e.g. principal ID.
 resource "random_uuid" "role_assignment_name_private_endpoint" {
   for_each = var.role_assignment_name_use_random_uuid ? local.role_assignments_private_endpoint_azapi_keys_only : {}
 }
