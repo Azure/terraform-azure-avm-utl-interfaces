@@ -62,6 +62,13 @@ variable "private_endpoints" {
     - `private_ip_address` - The private IP address of the IP configuration.
   DESCRIPTION
   nullable    = false
+
+  validation {
+    error_message = "If private endpoint role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
+    condition = anytrue([
+      for pe in var.private_endpoints : length(pe.role_assignments) > 0
+    ]) && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
+  }
 }
 
 variable "private_endpoints_manage_dns_zone_group" {
@@ -83,11 +90,5 @@ DESCRIPTION
   validation {
     condition     = length(var.private_endpoints) > 0 ? var.private_endpoints_scope != null : true
     error_message = "The private_endpoints_scope variable must be set when private_endpoints are defined."
-  }
-  validation {
-    error_message = "If private endpoint role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
-    condition = anytrue([
-      for pe in var.private_endpoints : length(pe.role_assignments) > 0
-    ]) && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
   }
 }
