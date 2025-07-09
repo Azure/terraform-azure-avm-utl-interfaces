@@ -94,7 +94,8 @@ locals {
     )
   }
   # Take the output from the data source and create a map of role_name to resource id.
-  role_assignments_role_name_to_resource_id = var.role_assignment_definition_lookup_enabled ? {
+  # But only if the lookup is enabled.
+  role_assignments_role_name_to_resource_id = local.role_assignment_definition_lookup_enabled ? {
     for res in data.azapi_resource_list.role_definitions[0].output.results : res.role_name => res.id
   } : {}
   # The type and api version of the role assignments resource.
