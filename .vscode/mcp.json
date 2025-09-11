@@ -1,17 +1,23 @@
 {
   "servers": {
-    "terraform-mcp-server": {
+    "terraform-mcp-eva": {
       "type": "stdio",
       "command": "docker",
       "args": [
         "run",
         "-i",
         "--rm",
-        "hashicorp/terraform-mcp-server"
-      ],
-      "cwd": "${workspaceFolder}",
-      "env": {}
+        "-v",
+        "${workspaceFolder}:/workspace",
+        "-w",
+        "/workspace",
+        "-e",
+        "TRANSPORT_MODE=stdio",
+        "-e",
+        "GITHUB_TOKEN",
+        "--pull=always",
+        "ghcr.io/lonegunmanb/terraform-mcp-eva"
+      ]
     }
-  },
-  "inputs": []
+  }
 }
