@@ -71,9 +71,9 @@ locals {
           eventHubAuthorizationRuleId = lookup(v, "event_hub_authorization_rule_resource_id", null)
           eventHubName                = lookup(v, "event_hub_name", null)
           logAnalyticsDestinationType = lookup(v, "log_analytics_destination_type", null)
-          logs                        = length(local.logs[k]) > 0 ? local.logs[k] : local.logs_deprecated[k]
+          logs                        = local.logs[k] != null ? local.logs[k] : local.logs_deprecated[k]
           marketplacePartnerId        = lookup(v, "marketplace_partner_resource_id", null)
-          metrics                     = length(local.metrics[k]) > 0 ? local.metrics[k] : local.metrics_deprecated[k]
+          metrics                     = local.metrics[k] != null ? local.metrics[k] : local.metrics_deprecated[k]
           storageAccountId            = lookup(v, "storage_account_resource_id", null)
           workspaceId                 = lookup(v, "workspace_resource_id", null)
         }
