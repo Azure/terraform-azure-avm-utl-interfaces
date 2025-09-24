@@ -70,9 +70,11 @@ resource "azapi_resource" "stg" {
 # In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
 # However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
 module "avm_interfaces" {
-  source = "../../"
+  source           = "../../"
+  this_resource_id = "${azapi_resource.stg.id}/blobServices/default"
+  parent_id        = azapi_resource.rg.id
 
-  diagnostic_settings_v2 = {
+  diagnostic_settings = {
     example = {
       name = "tolaw"
       logs = [{
@@ -84,11 +86,16 @@ module "avm_interfaces" {
   }
 }
 
-resource "azapi_resource" "diag_settings" {
-  for_each = module.avm_interfaces.diagnostic_settings_azapi
-
-  name      = each.value.name
-  parent_id = "${azapi_resource.stg.id}/blobServices/default"
-  type      = each.value.type
-  body      = each.value.body
+moved {
+  from = azapi_resource.diagnostic_settings
+  to   = module.avm_interfaces.azapi_resource.diagnostic_settings
 }
+
+# resource "azapi_resource" "diag_settings" {
+#   for_each = module.avm_interfaces.diagnostic_settings_azapi
+
+#   name      = each.value.name
+#   parent_id = "${azapi_resource.stg.id}/blobServices/default"
+#   type      = each.value.type
+#   body      = each.value.body
+# }

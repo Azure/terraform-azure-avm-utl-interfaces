@@ -14,7 +14,6 @@ locals {
   lock_private_endpoint_azapi = {
     for pe_key, pe_val in var.private_endpoints : pe_key => {
       pe_key = pe_key
-      type   = local.lock_type
       name   = lookup(pe_val.lock, "name", null)
       body = {
         properties = {
@@ -23,5 +22,5 @@ locals {
       }
     } if pe_val.lock != null
   }
-  lock_type = "Microsoft.Authorization/locks@2020-05-01"
+
 }

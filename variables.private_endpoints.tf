@@ -24,7 +24,7 @@ variable "private_endpoints" {
     private_service_connection_name         = optional(string, null)
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
+    resource_group_resource_id              = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
@@ -49,26 +49,19 @@ variable "private_endpoints" {
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `subresource_name` - The name of the sub resource for the private endpoint.
+  - `subresource_name` - (Optional) The name of the sub resource for the private endpoint.
   - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
   - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
   - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
   - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
   - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
   - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
+  - `resource_group_resource_id` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
   - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
     - `name` - The name of the IP configuration.
     - `private_ip_address` - The private IP address of the IP configuration.
   DESCRIPTION
   nullable    = false
-
-  validation {
-    error_message = "If private endpoint role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
-    condition = anytrue([
-      for pe in var.private_endpoints : length(pe.role_assignments) > 0
-    ]) && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
-  }
 }
 
 variable "private_endpoints_manage_dns_zone_group" {
@@ -76,19 +69,4 @@ variable "private_endpoints_manage_dns_zone_group" {
   default     = true
   description = "Whether to manage private DNS zone groups with this module. If set to false, you must manage private DNS zone groups externally, e.g. using Azure Policy."
   nullable    = false
-}
-
-variable "private_endpoints_scope" {
-  type        = string
-  default     = null
-  description = <<DESCRIPTION
-This is typically the resource ID of the resource that the private endpoint is connected to.
-
-Must be specified when `private_endpoints` are defined.
-DESCRIPTION
-
-  validation {
-    condition     = length(var.private_endpoints) > 0 ? var.private_endpoints_scope != null : true
-    error_message = "The private_endpoints_scope variable must be set when private_endpoints are defined."
-  }
 }
