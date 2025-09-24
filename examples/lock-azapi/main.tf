@@ -33,17 +33,19 @@ module "avm_interfaces" {
   }
 }
 
-resource "azapi_resource" "lock" {
-  name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : "lock-${azapi_resource.rg.name}"
-  parent_id = azapi_resource.rg.id
-  type      = module.avm_interfaces.lock_azapi.type
-  body      = module.avm_interfaces.lock_azapi.body
-}
 
-# To avoid issues with the idempotency check, we add a sleep resource.
-# This is not necessary in production code, but it helps to avoid issues in this example.
-resource "time_sleep" "wait_for_lock" {
-  create_duration = "20s"
 
-  depends_on = [azapi_resource.lock]
-}
+# resource "azapi_resource" "lock" {
+#   name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : "lock-${azapi_resource.rg.name}"
+#   parent_id = azapi_resource.rg.id
+#   type      = module.avm_interfaces.lock_azapi.type
+#   body      = module.avm_interfaces.lock_azapi.body
+# }
+
+# # To avoid issues with the idempotency check, we add a sleep resource.
+# # This is not necessary in production code, but it helps to avoid issues in this example.
+# resource "time_sleep" "wait_for_lock" {
+#   create_duration = "20s"
+
+#   depends_on = [azapi_resource.lock]
+# }

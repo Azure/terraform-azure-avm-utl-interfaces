@@ -87,7 +87,7 @@ module "avm_interfaces" {
 }
 
 moved {
-  from = azapi_resource.diagnostic_settings
+  from = azapi_resource.diag_settings
   to   = module.avm_interfaces.azapi_resource.diagnostic_settings
 }
 

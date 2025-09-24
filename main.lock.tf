@@ -4,6 +4,7 @@ locals {
 }
 
 resource "azapi_resource" "lock" {
+  count     = local.lock_azapi != null ? 1 : 0
   type      = local.lock_type
   name      = local.lock_azapi.name
   parent_id = var.this_resource_id
