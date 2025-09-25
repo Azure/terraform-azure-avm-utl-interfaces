@@ -77,26 +77,36 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
-  diagnostic_settings_v2 = {
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = "${azapi_resource.stg.id}/blobServices/default"
+  diagnostic_settings = {
     example = {
       name = "tolaw"
-      logs = [{
-        category_group = "audit"
-      }]
-      log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = azapi_resource.law.id
+      logs = [
+        {
+          category_group = "audit"
+          enabled        = true
+        }
+      ]
+      metric_categories     = [] # Setting to empty set to avoid sending all metrics
+      workspace_resource_id = azapi_resource.law.id
     }
   }
 }
 
-resource "azapi_resource" "diag_settings" {
-  for_each = module.avm_interfaces.diagnostic_settings_azapi
-
-  name      = each.value.name
-  parent_id = "${azapi_resource.stg.id}/blobServices/default"
-  type      = each.value.type
-  body      = each.value.body
+moved {
+  from = azapi_resource.diag_settings
+  to   = module.avm_interfaces.azapi_resource.diagnostic_settings
 }
+
+# resource "azapi_resource" "diag_settings" {
+#   for_each = module.avm_interfaces.diagnostic_settings_azapi
+
+#   name      = each.value.name
+#   parent_id = "${azapi_resource.stg.id}/blobServices/default"
+#   type      = each.value.type
+#   body      = each.value.body
+# }
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -114,7 +124,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.diag_settings](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.law](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.stg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)

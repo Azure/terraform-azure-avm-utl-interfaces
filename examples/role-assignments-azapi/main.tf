@@ -13,12 +13,11 @@ resource "azapi_resource" "rg" {
 # In ordinary usage, the role_assignments attribute value would be set to var.role_assignments.
 # However, in this example, we are using a data source in the same module to retrieve the object id.
 module "avm_interfaces" {
-  source           = "../../"
-  this_resource_id = azapi_resource.rg.id
+  source = "../../"
+
   parent_id        = azapi_resource.rg.id
-
+  this_resource_id = azapi_resource.rg.id
   enable_telemetry = var.enable_telemetry
-
   role_assignments = {
     example = {
       principal_id               = data.azapi_client_config.current.object_id

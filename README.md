@@ -47,9 +47,9 @@ If you are relying on Azure Policy to manage the DNS zone group, you should set 
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.9)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.12)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.5)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -59,19 +59,41 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock_private_endpoint](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_dns_zone_groups](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoint_locks](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoint_role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_endpoints](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments_private_endpoint](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_update_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/update_resource) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.role_assignment_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.role_assignment_name_private_endpoint](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 - [azapi_resource.customer_managed_key_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
-- [azapi_resource_list.role_definitions](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_list) (data source)
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
 
-No required inputs.
+The following input variables are required:
+
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
+
+Description: The resource ID of the parent resource, this will typically be a resource group or management group scope.
+
+Type: `string`
+
+### <a name="input_this_resource_id"></a> [this\_resource\_id](#input\_this\_resource\_id)
+
+Description: The resource ID of this resource, this is used when deploying extension resources such as role assignments.
+
+Type: `string`
 
 ## Optional Inputs
 
@@ -115,9 +137,22 @@ Default: `"vault.azure.net"`
 Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
   - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-  - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
-  - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
-  - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+  - `log_categories` - (Optional) DEPRECATED - use `logs` instead, set to empty set `[]` if you do not want logs. A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+  - `log_groups` - (Optional) DEPRECATED - use `logs` instead. A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+  - `logs` - (Optional) A list of log settings to send to the log analytics workspace.
+    - `category` - (Optional) The category of log to send. Either `category` or `category_group` must be set.
+    - `category_group` - (Optional) The category group of logs to send. Either `category` or `category_group` must be set.
+    - `enabled` - (Optional) Whether the log setting is enabled. Defaults to `true`.
+    - `retention_policy` - (Optional) The retention policy for the log setting.
+      - `days` - (Optional) The number of days to retain the logs for. A value of 0 means that logs are retained indefinitely. Defaults to `0`.
+      - `enabled` - (Optional) Whether the retention policy is enabled. Defaults to `false`.
+  - `metric_categories` - (Optional) DEPRECATED - use `metrics` instead, set to an empty set `[]` if you do not want metrics. A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+  - `metrics` - (Optional) A list of metric settings to send to the log analytics workspace.
+    - `category` - (Optional) The category of metric to send.
+    - `enabled` - (Optional) Whether the metric setting is enabled. Defaults to `true`.
+    - `retention_policy` - (Optional) The retention policy for the metric setting.
+      - `days` - (Optional) The number of days to retain the metrics for. A value of 0 means that metrics are retained indefinitely. Defaults to `0`.
+      - `enabled` - (Optional) Whether the retention policy is enabled. Defaults to `false`.
   - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
   - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
   - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
@@ -129,43 +164,11 @@ Type:
 
 ```hcl
 map(object({
-    name                                     = optional(string, null)
-    log_categories                           = optional(set(string), [])
-    log_groups                               = optional(set(string), ["allLogs"])
-    metric_categories                        = optional(set(string), ["AllMetrics"])
-    log_analytics_destination_type           = optional(string, "Dedicated")
-    workspace_resource_id                    = optional(string, null)
-    storage_account_resource_id              = optional(string, null)
-    event_hub_authorization_rule_resource_id = optional(string, null)
-    event_hub_name                           = optional(string, null)
-    marketplace_partner_resource_id          = optional(string, null)
-  }))
-```
-
-Default: `{}`
-
-### <a name="input_diagnostic_settings_v2"></a> [diagnostic\_settings\_v2](#input\_diagnostic\_settings\_v2)
-
-Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
-
-  This is a preview of the new diagnostic settings interface, which fully supports all features of the Azure Diagnostic Settings API.
-
-  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
-  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
-  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
-  - `logs` - (Optional) A set of log groups to send to the log analytics workspace.
-  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
-  - `metrics` - (Optional) A set of metric categories to send to the log analytics workspace.
-  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
-  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
-
-Type:
-
-```hcl
-map(object({
-    name = optional(string, null)
-    logs = optional(set(object({
+    name              = optional(string, null)
+    log_categories    = optional(set(string), [])
+    log_groups        = optional(set(string), ["allLogs"])
+    metric_categories = optional(set(string), ["AllMetrics"])
+    logs = optional(list(object({
       category       = optional(string, null)
       category_group = optional(string, null)
       enabled        = optional(bool, true)
@@ -174,7 +177,7 @@ map(object({
         enabled = optional(bool, false)
       }), {})
     })), [])
-    metrics = optional(set(object({
+    metrics = optional(list(object({
       category = optional(string, null)
       enabled  = optional(bool, true)
       retention_policy = optional(object({
@@ -182,7 +185,7 @@ map(object({
         enabled = optional(bool, false)
       }), {})
     })), [])
-    log_analytics_destination_type           = optional(string, "Dedicated")
+    log_analytics_destination_type           = optional(string, null)
     workspace_resource_id                    = optional(string, null)
     storage_account_resource_id              = optional(string, null)
     event_hub_authorization_rule_resource_id = optional(string, null)
@@ -202,6 +205,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The location for resources that require it.
+
+Type: `string`
+
+Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
@@ -258,14 +269,14 @@ Description:   A map of private endpoints to create. The map key is deliberately
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
-  - `subresource_name` - The name of the sub resource for the private endpoint.
+  - `subresource_name` - (Optional) The name of the sub resource for the private endpoint.
   - `private_dns_zone_group_name` - (Optional) The name of the private DNS zone group. One will be generated if not set.
   - `private_dns_zone_resource_ids` - (Optional) A set of resource IDs of private DNS zones to associate with the private endpoint. If not set, no zone groups will be created and the private endpoint will not be associated with any private DNS zones. DNS records must be managed external to this module.
   - `application_security_group_resource_ids` - (Optional) A map of resource IDs of application security groups to associate with the private endpoint. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
   - `private_service_connection_name` - (Optional) The name of the private service connection. One will be generated if not set.
   - `network_interface_name` - (Optional) The name of the network interface. One will be generated if not set.
   - `location` - (Optional) The Azure location where the resources will be deployed. Defaults to the location of the resource group.
-  - `resource_group_name` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
+  - `resource_group_resource_id` - (Optional) The resource group where the resources will be deployed. Defaults to the resource group of the Key Vault.
   - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
     - `name` - The name of the IP configuration.
     - `private_ip_address` - The private IP address of the IP configuration.
@@ -298,7 +309,7 @@ map(object({
     private_service_connection_name         = optional(string, null)
     network_interface_name                  = optional(string, null)
     location                                = optional(string, null)
-    resource_group_name                     = optional(string, null)
+    resource_group_resource_id              = optional(string, null)
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
@@ -316,46 +327,22 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_private_endpoints_scope"></a> [private\_endpoints\_scope](#input\_private\_endpoints\_scope)
+### <a name="input_role_assignment_definition_lookup_use_live_data"></a> [role\_assignment\_definition\_lookup\_use\_live\_data](#input\_role\_assignment\_definition\_lookup\_use\_live\_data)
 
-Description: This is typically the resource ID of the resource that the private endpoint is connected to.
-
-Must be specified when `private_endpoints` are defined.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_role_assignment_definition_lookup_enabled"></a> [role\_assignment\_definition\_lookup\_enabled](#input\_role\_assignment\_definition\_lookup\_enabled)
-
-Description: A control to disable the lookup of role definitions when creating role assignments.  
-If you disable this then all role assignments must be supplied with a `role_definition_id_or_name` that is a valid role definition ID.
+Description: A control to disable the live lookup of role definitions when creating role assignments.  
+If you disable this then cached data will be used instead, which is more stable. The role definition data does not change often so this is a reasonable approach.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
-### <a name="input_role_assignment_definition_scope"></a> [role\_assignment\_definition\_scope](#input\_role\_assignment\_definition\_scope)
+### <a name="input_role_assignment_replace_on_immutable_value_changes"></a> [role\_assignment\_replace\_on\_immutable\_value\_changes](#input\_role\_assignment\_replace\_on\_immutable\_value\_changes)
 
-Description: The scope at which the role assignments should be created. Used to look up role definitions by role name.
+Description: Whether to replace role assignments when the immutable values (principal ID or role definition ID) change.  
+This is disabled by default as any unknown values in these fields will cause the role assignment to be replaced on every apply.  
+If you are using known values for these fields then you can enable this to ensure that changes to the principal or role definition are applied.
 
-Must be specified when `role_assignments` are defined.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_role_assignment_name_use_random_uuid"></a> [role\_assignment\_name\_use\_random\_uuid](#input\_role\_assignment\_name\_use\_random\_uuid)
-
-Description: A control to use a random UUID for the role assignment name.  
-If set to false, the name will be a deterministic UUID based on the principal ID and role definition resource ID,  
-though this can cause issues with duplicate UUIDs as the scope of the role assignment is not taken into account.
-
-This is default to false to preserve existing behaviour.  
-However, we recommend this is set to true to avoid resources becoming re-created due to computed attribute changes in the resource graph.
-
-When this is set to true, you must not change the principal or role definition values in the `role_assignments` map after the initial creation of the role assignments as this will cause errors.  
-Instead, use a new key in the map with the new values and remove the old entry.
+Alternatively, remove the role assignment map entry and add a new one with a new key to achieve the same effect.
 
 Type: `bool`
 
@@ -367,10 +354,11 @@ Description:   A map of role assignments to create. The map key is deliberately 
   Do not change principal or role definition values in this map after the initial creation of the role assignments as this will cause errors.  
   Instead, add a new entry to the map with a new key and remove the old entry.
 
+  - `role_assignment_name` - (Optional) The name of the role assignment. Must be a UUID. If not specified, a random UUID will be generated. Changing this forces the creation of a new resource.
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment.
-  - `skip_service_principal_aad_check` - (Optional) No effect when using AzAPI.
+  - `skip_service_principal_aad_check` - DEPRECATED - (Optional) No effect when using AzAPI.
   - `condition` - (Optional) The condition which will be used to scope the role assignment.
   - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
   - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
@@ -380,6 +368,7 @@ Type:
 
 ```hcl
 map(object({
+    role_assignment_name                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)
@@ -413,14 +402,6 @@ Description: An object containing the following attributes:
 - `versionless_key_uri` - The URI of the key, without the version.
 
 ### <a name="output_diagnostic_settings_azapi"></a> [diagnostic\_settings\_azapi](#output\_diagnostic\_settings\_azapi)
-
-Description: A map of diagnostic settings for use in azapi\_resource, the value is an object containing the following attributes:
-
-- `type` - The type of the resource.
-- `name` - The name of the resource.
-- `body` - The body of the resource.
-
-### <a name="output_diagnostic_settings_azapi_v2"></a> [diagnostic\_settings\_azapi\_v2](#output\_diagnostic\_settings\_azapi\_v2)
 
 Description: A map of diagnostic settings for use in azapi\_resource, the value is an object containing the following attributes:
 
@@ -494,7 +475,13 @@ These role assignments should be used for private endpoints defined in var.priva
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_role_definitions"></a> [role\_definitions](#module\_role\_definitions)
+
+Source: Azure/avm-utl-roledefinitions/azure
+
+Version: 0.0.2
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

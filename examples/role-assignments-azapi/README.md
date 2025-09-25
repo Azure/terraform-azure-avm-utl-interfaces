@@ -20,7 +20,9 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
-  role_assignment_definition_scope = azapi_resource.rg.id
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.rg.id
+  enable_telemetry = var.enable_telemetry
   role_assignments = {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
@@ -32,14 +34,23 @@ module "avm_interfaces" {
 
 data "azapi_client_config" "current" {}
 
-resource "azapi_resource" "role_assignments" {
-  for_each = module.avm_interfaces.role_assignments_azapi
-
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
+moved {
+  from = azapi_resource.role_assignments
+  to   = module.avm_interfaces.azapi_resource.role_assignments
 }
+
+# resource "azapi_resource" "role_assignments" {
+#   for_each = module.avm_interfaces.role_assignments_azapi
+
+#   name      = each.value.name
+#   parent_id = azapi_resource.rg.id
+#   type      = each.value.type
+#   body      = each.value.body
+#   replace_triggers_refs = [
+#     "properties.principalId",
+#     "properties.roleDefinitionId",
+#   ]
+# }
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -58,7 +69,6 @@ The following requirements are needed by this module:
 The following resources are used by this module:
 
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.role_assignments](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 
@@ -70,6 +80,14 @@ No required inputs.
 ## Optional Inputs
 
 The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: n/a
+
+Type: `bool`
+
+Default: `true`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 
