@@ -70,18 +70,21 @@ resource "azapi_resource" "stg" {
 # In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
 # However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
 module "avm_interfaces" {
-  source           = "../../"
-  this_resource_id = "${azapi_resource.stg.id}/blobServices/default"
-  parent_id        = azapi_resource.rg.id
+  source = "../../"
 
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = "${azapi_resource.stg.id}/blobServices/default"
   diagnostic_settings = {
     example = {
       name = "tolaw"
-      logs = [{
-        category_group = "audit"
-      }]
-      log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = azapi_resource.law.id
+      logs = [
+        {
+          category_group = "audit"
+          enabled        = true
+        }
+      ]
+      metric_categories     = [] # Setting to empty set to avoid sending all metrics
+      workspace_resource_id = azapi_resource.law.id
     }
   }
 }

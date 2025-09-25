@@ -25,9 +25,8 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
-  this_resource_id = azapi_resource.rg.id
   parent_id        = azapi_resource.rg.id
-
+  this_resource_id = azapi_resource.rg.id
   lock = {
     kind = "CanNotDelete"
   }

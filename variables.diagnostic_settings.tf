@@ -59,10 +59,19 @@ variable "diagnostic_settings" {
   nullable    = false
 
   validation {
+    error_message = "Either logs `category` or `category_group` must be set, but not both."
     condition = alltrue(
       [
         for _, v in var.diagnostic_settings :
-        contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)
+        !(length(v.logs) > 0 && length(v.log_categories) > 0)
+      ]
+    )
+  }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings :
+        v.log_analytics_destination_type == null || contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)
       ]
     )
     error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."

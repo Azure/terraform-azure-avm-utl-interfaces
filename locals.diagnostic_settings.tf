@@ -7,6 +7,10 @@ locals {
           category      = null
           categoryGroup = log_group
           enabled       = true
+          retentionPolicy = {
+            days    = 0
+            enabled = false
+          }
         }
       ],
       [
@@ -14,6 +18,10 @@ locals {
           category      = log_category
           categoryGroup = null
           enabled       = true
+          retentionPolicy = {
+            days    = 0
+            enabled = false
+          }
         }
       ]
     )
@@ -24,8 +32,12 @@ locals {
       {
         category = category
         enabled  = true
+        retentionPolicy = {
+          days    = 0
+          enabled = false
+        }
       }
-    ] : null
+    ] : tolist(null)
   }
 }
 
@@ -43,7 +55,7 @@ locals {
           enabled = log.retention_policy.enabled
         }
       }
-    ] : null
+    ] : tolist(null)
   }
   metrics = {
     for k, v in var.diagnostic_settings : k => length(v.metrics) > 0 ? [
@@ -56,7 +68,16 @@ locals {
           enabled = metric.retention_policy.enabled
         }
       }
-    ] : null
+    ] : tolist(null)
+  }
+}
+
+locals {
+  logs_final_supplied = {
+    for k, v in var.diagnostic_settings : k => local.logs[k] != null ? local.logs[k] : local.logs_deprecated[k]
+  }
+  metrics_final_supplied = {
+    for k, v in var.diagnostic_settings : k => local.metrics[k] != null ? local.metrics[k] : local.metrics_deprecated[k]
   }
 }
 
@@ -71,9 +92,9 @@ locals {
           eventHubAuthorizationRuleId = lookup(v, "event_hub_authorization_rule_resource_id", null)
           eventHubName                = lookup(v, "event_hub_name", null)
           logAnalyticsDestinationType = lookup(v, "log_analytics_destination_type", null)
-          logs                        = local.logs[k] != null ? local.logs[k] : local.logs_deprecated[k]
+          logs                        = local.logs_final_supplied[k]
           marketplacePartnerId        = lookup(v, "marketplace_partner_resource_id", null)
-          metrics                     = local.metrics[k] != null ? local.metrics[k] : local.metrics_deprecated[k]
+          metrics                     = local.metrics_final_supplied[k]
           storageAccountId            = lookup(v, "storage_account_resource_id", null)
           workspaceId                 = lookup(v, "workspace_resource_id", null)
         }

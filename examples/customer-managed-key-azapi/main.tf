@@ -108,9 +108,8 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
-  this_resource_id = azapi_resource.storage.id
   parent_id        = azapi_resource.rg.id
-
+  this_resource_id = azapi_resource.storage.id
   customer_managed_key = {
     key_name              = "cmk"
     key_vault_resource_id = module.key_vault.resource_id

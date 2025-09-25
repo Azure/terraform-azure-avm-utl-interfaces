@@ -22,5 +22,4 @@ locals {
       }
     } if pe_val.lock != null
   }
-
 }

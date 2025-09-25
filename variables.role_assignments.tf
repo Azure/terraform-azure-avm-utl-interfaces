@@ -59,7 +59,6 @@ DESCRIPTION
       )
     ])
   }
-
   validation {
     error_message = "principal_id must be a UUID"
     condition = alltrue([
@@ -68,7 +67,6 @@ DESCRIPTION
       )
     ])
   }
-
   validation {
     error_message = "condition_version must be '2.0' if condition is set"
     condition = alltrue([

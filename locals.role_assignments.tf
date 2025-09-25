@@ -36,7 +36,6 @@ locals {
       }
     }
   }
-
   # Create a flattened map of role assignments for private endpoints.
   # Only include keys to avoid cycle errors.
   role_assignments_private_endpoint_azapi_keys_only = {
