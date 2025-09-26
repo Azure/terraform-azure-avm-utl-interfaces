@@ -141,11 +141,10 @@ locals {
 # but it doesn't hurt to ensure there are no duplicates.
 locals {
   logs_combined_all = {
-    for k, v in data.azapi_resource.diagnostic_settings : k => distinct(
-      concat(
-        local.logs_combined_category_groups[k],
-        local.logs_combined_categories[k]
-      )
+    for k, v in data.azapi_resource.diagnostic_settings : k =>
+    concat(
+      local.logs_combined_category_groups[k],
+      local.logs_combined_categories[k]
     )
   }
 }
@@ -182,14 +181,14 @@ locals {
 # Finally, we convert the map back to a list by accessing the values of the map.
 locals {
   metrics_combined = {
-    for k, v in var.diagnostic_settings : k => distinct([
+    for k, v in var.diagnostic_settings : k => [
       for k2 in distinct(
         concat(
           keys(local.metrics_existing[k]),
           keys(local.metrics_supplied[k])
         )
       ) : try(local.metrics_supplied[k][k2], local.metrics_existing[k][k2])
-    ])
+    ]
   }
 }
 
