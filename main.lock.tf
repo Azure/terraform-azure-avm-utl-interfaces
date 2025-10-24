@@ -3,6 +3,12 @@ locals {
   lock_type = "Microsoft.Authorization/locks@2020-05-01"
 }
 
+# resource "terraform_data" "lock_dependency" {
+#   count = local.lock_azapi != null ? 1 : 0
+
+#   input = var.lock_dependency_input
+# }
+
 resource "azapi_resource" "lock" {
   count = local.lock_azapi != null ? 1 : 0
 
@@ -16,10 +22,12 @@ resource "azapi_resource" "lock" {
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   depends_on = [
-    azapi_resource.role_assignments,
-    azapi_resource.role_assignments_private_endpoint,
-    azapi_resource.private_endpoints,
     azapi_resource.private_dns_zone_groups,
+    azapi_resource.private_endpoints,
+    azapi_resource.role_assignments_private_endpoint,
+    azapi_resource.role_assignments,
+    azapi_update_resource.diagnostic_settings,
+    #terraform_data.lock_dependency,
   ]
 }
 
@@ -36,6 +44,6 @@ resource "azapi_resource" "lock_private_endpoint" {
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   depends_on = [
-    # Put everything in here
+    azapi_resource.private_dns_zone_groups,
   ]
 }
