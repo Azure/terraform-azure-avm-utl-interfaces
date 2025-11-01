@@ -3,6 +3,7 @@ locals {
   role_assignments_azapi = {
     for k, v in var.role_assignments : k => {
       name = coalesce(v.role_assignment_name, random_uuid.role_assignment_name[k].result)
+      type = local.role_assignments_type
       body = {
         properties = {
           principalId                        = v.principal_id
@@ -23,6 +24,7 @@ locals {
       pe_key         = v.pe_key
       assignment_key = v.assignment_key
       name           = random_uuid.role_assignment_name_private_endpoint[k].result
+      type = local.role_assignments_type
       body = {
         properties = {
           principalId                        = var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].principal_id
