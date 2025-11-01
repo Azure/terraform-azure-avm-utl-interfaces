@@ -23,6 +23,9 @@ resource "random_uuid" "role_assignment_name_private_endpoint" {
   for_each = local.role_assignments_private_endpoint_azapi_keys_only
 }
 
+# Step 1: Create the role assignments with ignore_changes for drift-prone properties.
+# Azure APIs automatically infer and return principalType and normalize roleDefinitionId paths,
+# which causes drift if we don't ignore them on initial creation.
 resource "azapi_resource" "role_assignments" {
   for_each = local.role_assignments_azapi
 
@@ -34,8 +37,41 @@ resource "azapi_resource" "role_assignments" {
   delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+
+  lifecycle {
+    ignore_changes = [body.properties.principalType, body.properties.roleDefinitionId]
+  }
 }
 
+# Step 2: Read the actual state from Azure after creation.
+# This captures the principalType and roleDefinitionId values that Azure automatically sets.
+data "azapi_resource" "role_assignments" {
+  for_each = azapi_resource.role_assignments
+
+  resource_id = each.value.id
+  type        = each.value.type
+  response_export_values = {
+    properties = "properties"
+  }
+}
+
+# Step 3: Update the role assignments with merged configuration.
+# Combine user-supplied values with Azure-inferred values to eliminate drift.
+resource "azapi_update_resource" "role_assignments" {
+  for_each = data.azapi_resource.role_assignments
+
+  resource_id = each.value.id
+  type        = each.value.type
+  body = {
+    properties = local.role_assignments_merged[each.key]
+  }
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+}
+
+# Step 1: Create the role assignments with ignore_changes for drift-prone properties.
+# Azure APIs automatically infer and return principalType and normalize roleDefinitionId paths,
+# which causes drift if we don't ignore them on initial creation.
 resource "azapi_resource" "role_assignments_private_endpoint" {
   for_each = local.role_assignments_private_endpoint_azapi
 
@@ -45,6 +81,36 @@ resource "azapi_resource" "role_assignments_private_endpoint" {
   body           = each.value.body
   create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+
+  lifecycle {
+    ignore_changes = [body.properties.principalType, body.properties.roleDefinitionId]
+  }
+}
+
+# Step 2: Read the actual state from Azure after creation.
+# This captures the principalType and roleDefinitionId values that Azure automatically sets.
+data "azapi_resource" "role_assignments_private_endpoint" {
+  for_each = azapi_resource.role_assignments_private_endpoint
+
+  resource_id = each.value.id
+  type        = each.value.type
+  response_export_values = {
+    properties = "properties"
+  }
+}
+
+# Step 3: Update the role assignments with merged configuration.
+# Combine user-supplied values with Azure-inferred values to eliminate drift.
+resource "azapi_update_resource" "role_assignments_private_endpoint" {
+  for_each = data.azapi_resource.role_assignments_private_endpoint
+
+  resource_id = each.value.id
+  type        = each.value.type
+  body = {
+    properties = local.role_assignments_private_endpoint_merged[each.key]
+  }
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 }

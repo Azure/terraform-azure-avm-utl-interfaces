@@ -3,6 +3,7 @@ locals {
   role_assignments_azapi = {
     for k, v in var.role_assignments : k => {
       name = coalesce(v.role_assignment_name, random_uuid.role_assignment_name[k].result)
+      type = local.role_assignments_type
       body = {
         properties = {
           principalId                        = v.principal_id
@@ -16,6 +17,22 @@ locals {
       }
     }
   }
+
+  # Merge user-supplied configuration with Azure-returned values to prevent drift.
+  # Azure automatically infers principalType and returns fully qualified roleDefinitionId paths.
+  # We prefer user-supplied values where provided, but accept Azure's values for drift-prone fields.
+  role_assignments_merged = {
+    for k, v in data.azapi_resource.role_assignments : k => {
+      principalId                        = local.role_assignments_azapi[k].body.properties.principalId
+      roleDefinitionId                   = v.output.properties.roleDefinitionId # Use Azure's normalized path
+      conditionVersion                   = local.role_assignments_azapi[k].body.properties.conditionVersion
+      condition                          = local.role_assignments_azapi[k].body.properties.condition
+      description                        = local.role_assignments_azapi[k].body.properties.description
+      principalType                      = v.output.properties.principalType # Use Azure's inferred value
+      delegatedManagedIdentityResourceId = local.role_assignments_azapi[k].body.properties.delegatedManagedIdentityResourceId
+    }
+  }
+
   # The role assignments for private endpoints.
   # We reference the variable to avoid cycle errors.
   role_assignments_private_endpoint_azapi = {
@@ -23,6 +40,7 @@ locals {
       pe_key         = v.pe_key
       assignment_key = v.assignment_key
       name           = random_uuid.role_assignment_name_private_endpoint[k].result
+      type           = local.role_assignments_type
       body = {
         properties = {
           principalId                        = var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].principal_id
@@ -36,6 +54,21 @@ locals {
       }
     }
   }
+
+  # Merge user-supplied configuration with Azure-returned values for private endpoint role assignments.
+  # Same drift prevention logic as above, applied to private endpoint role assignments.
+  role_assignments_private_endpoint_merged = {
+    for k, v in data.azapi_resource.role_assignments_private_endpoint : k => {
+      principalId                        = local.role_assignments_private_endpoint_azapi[k].body.properties.principalId
+      roleDefinitionId                   = v.output.properties.roleDefinitionId # Use Azure's normalized path
+      conditionVersion                   = local.role_assignments_private_endpoint_azapi[k].body.properties.conditionVersion
+      condition                          = local.role_assignments_private_endpoint_azapi[k].body.properties.condition
+      description                        = local.role_assignments_private_endpoint_azapi[k].body.properties.description
+      principalType                      = v.output.properties.principalType # Use Azure's inferred value
+      delegatedManagedIdentityResourceId = local.role_assignments_private_endpoint_azapi[k].body.properties.delegatedManagedIdentityResourceId
+    }
+  }
+
   # Create a flattened map of role assignments for private endpoints.
   # Only include keys to avoid cycle errors.
   role_assignments_private_endpoint_azapi_keys_only = {
