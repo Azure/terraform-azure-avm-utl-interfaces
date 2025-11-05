@@ -113,6 +113,7 @@ module "avm_interfaces_storage" {
       workspace_resource_id = azapi_resource.law.id
     }
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 # In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
@@ -131,10 +132,10 @@ module "avm_interfaces_key_vault" {
           enabled        = true
         }
       ]
-      metric_categories     = [] # Setting to empty set to avoid sending all metrics
       workspace_resource_id = azapi_resource.law.id
     }
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 # This is how to migrate from the previous module version.
@@ -182,7 +183,15 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: Enable telemetry for this module.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 

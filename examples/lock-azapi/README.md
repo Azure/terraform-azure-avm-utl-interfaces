@@ -32,12 +32,11 @@ module "avm_interfaces" {
 
   parent_id        = azapi_resource.rg.id
   this_resource_id = azapi_resource.rg.id
+  enable_telemetry = var.enable_telemetry
   lock = {
     kind = "CanNotDelete"
   }
 }
-
-
 
 # resource "azapi_resource" "lock" {
 #   name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : "lock-${azapi_resource.rg.name}"
@@ -66,8 +65,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.6)
 
-- <a name="requirement_time"></a> [time](#requirement\_time) (~> 0.13)
-
 ## Resources
 
 The following resources are used by this module:
@@ -83,7 +80,15 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: Enable telemetry for this module.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 

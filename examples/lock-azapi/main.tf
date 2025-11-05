@@ -27,12 +27,11 @@ module "avm_interfaces" {
 
   parent_id        = azapi_resource.rg.id
   this_resource_id = azapi_resource.rg.id
+  enable_telemetry = var.enable_telemetry
   lock = {
     kind = "CanNotDelete"
   }
 }
-
-
 
 # resource "azapi_resource" "lock" {
 #   name      = module.avm_interfaces.lock_azapi.name != null ? module.avm_interfaces.lock_azapi.name : "lock-${azapi_resource.rg.name}"

@@ -166,8 +166,8 @@ Type:
 map(object({
     name              = optional(string, null)
     log_categories    = optional(set(string), [])
-    log_groups        = optional(set(string), ["allLogs"])
-    metric_categories = optional(set(string), ["AllMetrics"])
+    log_groups        = optional(set(string), [])
+    metric_categories = optional(set(string), [])
     logs = optional(list(object({
       category       = optional(string, null)
       category_group = optional(string, null)
