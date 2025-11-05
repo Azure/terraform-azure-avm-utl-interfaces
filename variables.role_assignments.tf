@@ -22,7 +22,7 @@ DESCRIPTION
 
 variable "role_assignments" {
   type = map(object({
-    role_assignment_name                   = optional(string, null)
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)

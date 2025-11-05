@@ -72,9 +72,30 @@ resource "azapi_resource" "stg" {
   }
 }
 
+data "azapi_client_config" "current" {}
+
+resource "azapi_resource" "key_vault" {
+  location  = azapi_resource.rg.location
+  name      = "kv-${random_pet.name.id}"
+  parent_id = azapi_resource.rg.id
+  type      = "Microsoft.KeyVault/vaults@2024-11-01"
+  body = {
+    properties = {
+      enableRbacAuthorization = true
+      publicNetworkAccess     = "Enabled"
+      sku = {
+        family = "A"
+        name   = "standard"
+      }
+      tenantId = data.azapi_client_config.current.tenant_id
+    }
+  }
+  response_export_values = ["properties.vaultUri"]
+}
+
 # In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
 # However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
-module "avm_interfaces" {
+module "avm_interfaces_storage" {
   source = "../../"
 
   parent_id        = azapi_resource.rg.id
@@ -94,6 +115,29 @@ module "avm_interfaces" {
   }
 }
 
+# In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
+# However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
+module "avm_interfaces_key_vault" {
+  source = "../../"
+
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.key_vault.id
+  diagnostic_settings = {
+    example = {
+      name = "tolaw"
+      logs = [
+        {
+          category_group = "audit"
+          enabled        = true
+        }
+      ]
+      metric_categories     = [] # Setting to empty set to avoid sending all metrics
+      workspace_resource_id = azapi_resource.law.id
+    }
+  }
+}
+
+# This is how to migrate from the previous module version.
 moved {
   from = azapi_resource.diag_settings
   to   = module.avm_interfaces.azapi_resource.diagnostic_settings
@@ -124,10 +168,12 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.key_vault](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.law](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.stg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -146,7 +192,13 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
+### <a name="module_avm_interfaces_key_vault"></a> [avm\_interfaces\_key\_vault](#module\_avm\_interfaces\_key\_vault)
+
+Source: ../../
+
+Version:
+
+### <a name="module_avm_interfaces_storage"></a> [avm\_interfaces\_storage](#module\_avm\_interfaces\_storage)
 
 Source: ../../
 

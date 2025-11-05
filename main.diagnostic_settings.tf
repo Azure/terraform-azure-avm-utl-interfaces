@@ -30,15 +30,16 @@
 resource "azapi_resource" "diagnostic_settings" {
   for_each = local.diagnostic_settings_azapi
 
-  name                 = each.value.name
-  parent_id            = var.this_resource_id
-  type                 = local.diagnostic_settings_type
-  body                 = each.value.body
-  create_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  ignore_null_property = true
-  read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  update_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  name                   = each.value.name
+  parent_id              = var.this_resource_id
+  type                   = local.diagnostic_settings_type
+  body                   = each.value.body
+  create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_null_property   = true
+  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  response_export_values = []
+  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   lifecycle {
     ignore_changes = [body.properties.logs, body.properties.metrics]
@@ -207,6 +208,7 @@ resource "azapi_update_resource" "diagnostic_settings" {
       logs    = local.logs_combined_all[each.key]
     }
   }
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  response_export_values = []
+  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 }

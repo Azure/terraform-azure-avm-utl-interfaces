@@ -256,6 +256,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
 
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
+    - `name` - (Optional) The name of the role assignment. Must be a UUID. If not specified, a random UUID will be generated. Changing this forces the creation of a new resource.
     - `role_definition_id_or_name` - The ID or name of the role definition to assign.
     - `principal_id` - The ID of the principal to assign the role to.
     - `description` - (Optional) A description of the role assignment.
@@ -287,6 +288,7 @@ Type:
 map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
+      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -368,7 +370,7 @@ Type:
 
 ```hcl
 map(object({
-    role_assignment_name                   = optional(string, null)
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)
@@ -481,7 +483,7 @@ The following Modules are called:
 
 Source: Azure/avm-utl-roledefinitions/azure
 
-Version: 0.0.2
+Version: 0.1.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

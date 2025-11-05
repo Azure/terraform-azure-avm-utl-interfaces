@@ -108,6 +108,7 @@ module "avm_interfaces_storage" {
       workspace_resource_id = azapi_resource.law.id
     }
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 # In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
@@ -126,10 +127,10 @@ module "avm_interfaces_key_vault" {
           enabled        = true
         }
       ]
-      metric_categories     = [] # Setting to empty set to avoid sending all metrics
       workspace_resource_id = azapi_resource.law.id
     }
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 # This is how to migrate from the previous module version.
