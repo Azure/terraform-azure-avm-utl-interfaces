@@ -13,8 +13,9 @@ variable "private_endpoints" {
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      kind = string
-      name = optional(string, null)
+      kind  = string
+      name  = optional(string, null)
+      notes = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
@@ -49,6 +50,7 @@ variable "private_endpoints" {
   - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+    - `notes` - (Optional) Notes about the lock.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
   - `subresource_name` - (Optional) The name of the sub resource for the private endpoint.

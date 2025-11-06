@@ -5,6 +5,7 @@ locals {
     body = {
       properties = {
         level = var.lock.kind
+        notes = var.lock.notes
       }
     }
   } : null
@@ -18,6 +19,7 @@ locals {
       body = {
         properties = {
           level = pe_val.lock.kind
+          notes = pe_val.lock.notes
         }
       }
     } if pe_val.lock != null

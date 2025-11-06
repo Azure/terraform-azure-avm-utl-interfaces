@@ -123,6 +123,7 @@ module "avm_interfaces" {
       azapi_resource.umi.id
     ]
   }
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "azapi_resource" "storage" {
