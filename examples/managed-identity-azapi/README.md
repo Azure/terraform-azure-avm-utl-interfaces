@@ -37,6 +37,8 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.stg.id
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = []

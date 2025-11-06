@@ -66,6 +66,8 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.stg.id
   private_endpoints = {
     example = {
       subnet_resource_id            = local.subnet_resource_id
@@ -91,78 +93,93 @@ module "avm_interfaces" {
       }
     }
   }
-  private_endpoints_scope              = azapi_resource.keyvault.id
-  role_assignment_definition_scope     = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
-  role_assignment_name_use_random_uuid = true
 }
 
-
-
-resource "azapi_resource" "private_endpoints" {
-  for_each = module.avm_interfaces.private_endpoints_azapi
-
-  location  = azapi_resource.keyvault.location
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
-  retry = {
-    error_message_regex  = ["ScopeLocked"]
-    interval_seconds     = 15
-    max_interval_seconds = 60
-  }
-
-  timeouts {
-    delete = "5m"
-  }
+moved {
+  from = azapi_resource.private_endpoints
+  to   = module.avm_interfaces.azapi_resource.private_endpoints
 }
 
-resource "azapi_resource" "private_endpoint_locks" {
-  for_each = module.avm_interfaces.lock_private_endpoint_azapi
-
-  name      = each.value.name
-  parent_id = azapi_resource.private_endpoints[each.value.pe_key].id
-  type      = each.value.type
-  body      = each.value.body
-
-  depends_on = [
-    azapi_resource.private_dns_zone_groups,
-    azapi_resource.private_endpoint_role_assignments
-  ]
+moved {
+  from = azapi_resource.private_endpoint_locks
+  to   = module.avm_interfaces.azapi_resource.private_endpoint_locks
 }
 
-resource "azapi_resource" "private_dns_zone_groups" {
-  for_each = module.avm_interfaces.private_dns_zone_groups_azapi
-
-  name      = each.value.name
-  parent_id = azapi_resource.private_endpoints[each.key].id
-  type      = each.value.type
-  body      = each.value.body
-  retry = {
-    error_message_regex  = ["ScopeLocked"]
-    interval_seconds     = 15
-    max_interval_seconds = 60
-  }
-
-  timeouts {
-    delete = "5m"
-  }
+moved {
+  from = azapi_resource.private_dns_zone_groups
+  to   = module.avm_interfaces.azapi_resource.private_dns_zone_groups
 }
 
-resource "azapi_resource" "private_endpoint_role_assignments" {
-  for_each = module.avm_interfaces.role_assignments_private_endpoint_azapi
-
-  name      = each.value.name
-  parent_id = azapi_resource.private_endpoints[each.value.pe_key].id
-  type      = each.value.type
-  body      = each.value.body
-  retry = {
-    error_message_regex  = ["ScopeLocked"]
-    interval_seconds     = 15
-    max_interval_seconds = 60
-  }
-
-  timeouts {
-    delete = "5m"
-  }
+moved {
+  from = azapi_resource.private_endpoint_role_assignments
+  to   = module.avm_interfaces.azapi_resource.private_endpoint_role_assignments
 }
+
+# resource "azapi_resource" "private_endpoints" {
+#   for_each = module.avm_interfaces.private_endpoints_azapi
+
+#   location  = azapi_resource.keyvault.location
+#   name      = each.value.name
+#   parent_id = azapi_resource.rg.id
+#   type      = each.value.type
+#   body      = each.value.body
+#   retry = {
+#     error_message_regex  = ["ScopeLocked"]
+#     interval_seconds     = 15
+#     max_interval_seconds = 60
+#   }
+
+#   timeouts {
+#     delete = "5m"
+#   }
+# }
+
+# resource "azapi_resource" "private_endpoint_locks" {
+#   for_each = module.avm_interfaces.lock_private_endpoint_azapi
+
+#   name      = each.value.name
+#   parent_id = azapi_resource.private_endpoints[each.value.pe_key].id
+#   type      = each.value.type
+#   body      = each.value.body
+
+#   depends_on = [
+#     azapi_resource.private_dns_zone_groups,
+#     azapi_resource.private_endpoint_role_assignments
+#   ]
+# }
+
+# resource "azapi_resource" "private_dns_zone_groups" {
+#   for_each = module.avm_interfaces.private_dns_zone_groups_azapi
+
+#   name      = each.value.name
+#   parent_id = azapi_resource.private_endpoints[each.key].id
+#   type      = each.value.type
+#   body      = each.value.body
+#   retry = {
+#     error_message_regex  = ["ScopeLocked"]
+#     interval_seconds     = 15
+#     max_interval_seconds = 60
+#   }
+
+#   timeouts {
+#     delete = "5m"
+#   }
+# }
+
+# resource "azapi_resource" "private_endpoint_role_assignments" {
+#   for_each = module.avm_interfaces.role_assignments_private_endpoint_azapi
+
+#   name      = each.value.name
+#   parent_id = azapi_resource.private_endpoints[each.value.pe_key].id
+#   type      = each.value.type
+#   body      = each.value.body
+#   retry = {
+#     error_message_regex  = ["ScopeLocked"]
+#     interval_seconds     = 15
+#     max_interval_seconds = 60
+#   }
+
+#   timeouts {
+#     delete = "5m"
+#   }
+# }
