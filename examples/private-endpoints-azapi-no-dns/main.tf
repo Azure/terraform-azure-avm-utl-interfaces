@@ -73,6 +73,8 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.keyvault.id
   private_endpoints = {
     example = {
       name                            = "pe-${azapi_resource.keyvault.name}"
@@ -93,18 +95,20 @@ module "avm_interfaces" {
     }
   }
   private_endpoints_manage_dns_zone_group = false
-  private_endpoints_scope                 = azapi_resource.keyvault.id
-  role_assignment_definition_scope        = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
 }
 
 
-
-resource "azapi_resource" "private_endpoints" {
-  for_each = module.avm_interfaces.private_endpoints_azapi
-
-  location  = azapi_resource.keyvault.location
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
+moved {
+  from = azapi_resource.private_endpoints
+  to   = module.avm_interfaces.azapi_resource.private_endpoints
 }
+
+# resource "azapi_resource" "private_endpoints" {
+#   for_each = module.avm_interfaces.private_endpoints_azapi
+
+#   location  = azapi_resource.keyvault.location
+#   name      = each.value.name
+#   parent_id = azapi_resource.rg.id
+#   type      = each.value.type
+#   body      = each.value.body
+# }

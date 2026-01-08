@@ -72,31 +72,86 @@ resource "azapi_resource" "stg" {
   }
 }
 
-# In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
-# However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
-module "avm_interfaces" {
-  source = "../../"
+data "azapi_client_config" "current" {}
 
-  diagnostic_settings_v2 = {
-    example = {
-      name = "tolaw"
-      logs = [{
-        category_group = "audit"
-      }]
-      log_analytics_destination_type = "Dedicated"
-      workspace_resource_id          = azapi_resource.law.id
+resource "azapi_resource" "key_vault" {
+  location  = azapi_resource.rg.location
+  name      = "kv-${random_pet.name.id}"
+  parent_id = azapi_resource.rg.id
+  type      = "Microsoft.KeyVault/vaults@2024-11-01"
+  body = {
+    properties = {
+      enableRbacAuthorization = true
+      publicNetworkAccess     = "Enabled"
+      sku = {
+        family = "A"
+        name   = "standard"
+      }
+      tenantId = data.azapi_client_config.current.tenant_id
     }
   }
+  response_export_values = ["properties.vaultUri"]
 }
 
-resource "azapi_resource" "diag_settings" {
-  for_each = module.avm_interfaces.diagnostic_settings_azapi
+# In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
+# However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
+module "avm_interfaces_storage" {
+  source = "../../"
 
-  name      = each.value.name
-  parent_id = "${azapi_resource.stg.id}/blobServices/default"
-  type      = each.value.type
-  body      = each.value.body
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = "${azapi_resource.stg.id}/blobServices/default"
+  diagnostic_settings = {
+    example = {
+      name = "tolaw"
+      logs = [
+        {
+          category_group = "audit"
+          enabled        = true
+        }
+      ]
+      metric_categories     = [] # Setting to empty set to avoid sending all metrics
+      workspace_resource_id = azapi_resource.law.id
+    }
+  }
+  enable_telemetry = var.enable_telemetry
 }
+
+# In ordinary usage, the diagnostic_settings attribute value would be set to var.diagnostic_settings.
+# However, because we are creating the log analytics workspace in this example, we need to set the workspace_resource_id attribute value to the ID of the log analytics workspace.
+module "avm_interfaces_key_vault" {
+  source = "../../"
+
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.key_vault.id
+  diagnostic_settings = {
+    example = {
+      name = "tolaw"
+      logs = [
+        {
+          category_group = "audit"
+          enabled        = true
+        }
+      ]
+      workspace_resource_id = azapi_resource.law.id
+    }
+  }
+  enable_telemetry = var.enable_telemetry
+}
+
+# This is how to migrate from the previous module version.
+moved {
+  from = azapi_resource.diag_settings
+  to   = module.avm_interfaces.azapi_resource.diagnostic_settings
+}
+
+# resource "azapi_resource" "diag_settings" {
+#   for_each = module.avm_interfaces.diagnostic_settings_azapi
+
+#   name      = each.value.name
+#   parent_id = "${azapi_resource.stg.id}/blobServices/default"
+#   type      = each.value.type
+#   body      = each.value.body
+# }
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -114,11 +169,12 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.diag_settings](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.key_vault](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.law](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.rg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.stg](https://registry.terraform.io/providers/azure/azapi/latest/docs/resources/resource) (resource)
 - [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -127,7 +183,15 @@ No required inputs.
 
 ## Optional Inputs
 
-No optional inputs.
+The following input variables are optional (have default values):
+
+### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
+
+Description: Enable telemetry for this module.
+
+Type: `bool`
+
+Default: `true`
 
 ## Outputs
 
@@ -137,7 +201,13 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
+### <a name="module_avm_interfaces_key_vault"></a> [avm\_interfaces\_key\_vault](#module\_avm\_interfaces\_key\_vault)
+
+Source: ../../
+
+Version:
+
+### <a name="module_avm_interfaces_storage"></a> [avm\_interfaces\_storage](#module\_avm\_interfaces\_storage)
 
 Source: ../../
 

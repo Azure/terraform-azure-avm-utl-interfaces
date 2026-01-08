@@ -1,41 +1,28 @@
-variable "role_assignment_definition_lookup_enabled" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-A control to disable the lookup of role definitions when creating role assignments.
-If you disable this then all role assignments must be supplied with a `role_definition_id_or_name` that is a valid role definition ID.
-DESCRIPTION
-}
-
-variable "role_assignment_definition_scope" {
-  type        = string
-  default     = null
-  description = <<DESCRIPTION
-The scope at which the role assignments should be created. Used to look up role definitions by role name.
-
-Must be specified when `role_assignments` are defined.
-DESCRIPTION
-}
-
-variable "role_assignment_name_use_random_uuid" {
+variable "role_assignment_definition_lookup_use_live_data" {
   type        = bool
   default     = false
   description = <<DESCRIPTION
-A control to use a random UUID for the role assignment name.
-If set to false, the name will be a deterministic UUID based on the principal ID and role definition resource ID,
-though this can cause issues with duplicate UUIDs as the scope of the role assignment is not taken into account.
+A control to disable the live lookup of role definitions when creating role assignments.
+If you disable this then cached data will be used instead, which is more stable. The role definition data does not change often so this is a reasonable approach.
+DESCRIPTION
+}
 
-This is default to false to preserve existing behaviour.
-However, we recommend this is set to true to avoid resources becoming re-created due to computed attribute changes in the resource graph.
+variable "role_assignment_replace_on_immutable_value_changes" {
+  type        = bool
+  default     = false
+  description = <<DESCRIPTION
+Whether to replace role assignments when the immutable values (principal ID or role definition ID) change.
+This is disabled by default as any unknown values in these fields will cause the role assignment to be replaced on every apply.
+If you are using known values for these fields then you can enable this to ensure that changes to the principal or role definition are applied.
 
-When this is set to true, you must not change the principal or role definition values in the `role_assignments` map after the initial creation of the role assignments as this will cause errors.
-Instead, use a new key in the map with the new values and remove the old entry.
+Alternatively, remove the role assignment map entry and add a new one with a new key to achieve the same effect.
 DESCRIPTION
   nullable    = false
 }
 
 variable "role_assignments" {
   type = map(object({
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)
@@ -51,10 +38,11 @@ variable "role_assignments" {
   Do not change principal or role definition values in this map after the initial creation of the role assignments as this will cause errors.
   Instead, add a new entry to the map with a new key and remove the old entry.
 
+  - `role_assignment_name` - (Optional) The name of the role assignment. Must be a UUID. If not specified, a random UUID will be generated. Changing this forces the creation of a new resource.
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment.
-  - `skip_service_principal_aad_check` - (Optional) No effect when using AzAPI.
+  - `skip_service_principal_aad_check` - DEPRECATED - (Optional) No effect when using AzAPI.
   - `condition` - (Optional) The condition which will be used to scope the role assignment.
   - `condition_version` - (Optional) The version of the condition syntax. Leave as `null` if you are not using a condition, if you are then valid values are '2.0'.
   - `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
@@ -63,7 +51,28 @@ DESCRIPTION
   nullable    = false
 
   validation {
-    error_message = "If role_assignments are specified and role_assignment_definition_lookup_enabled is true, then role_assignment_definition_scope must be set."
-    condition     = length(var.role_assignments) > 0 && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
+    error_message = "principal_type must be one of 'User', 'Group', or 'ServicePrincipal'"
+    condition = alltrue([
+      for _, v in var.role_assignments : (
+        v.principal_type == null ||
+        contains(["User", "Group", "ServicePrincipal", "MSI"], v.principal_type)
+      )
+    ])
+  }
+  validation {
+    error_message = "principal_id must be a UUID"
+    condition = alltrue([
+      for _, v in var.role_assignments : (
+        can(regex("^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$", v.principal_id))
+      )
+    ])
+  }
+  validation {
+    error_message = "condition_version must be '2.0' if condition is set"
+    condition = alltrue([
+      for _, v in var.role_assignments : (
+        v.condition == null || (v.condition_version == "2.0")
+      )
+    ])
   }
 }
