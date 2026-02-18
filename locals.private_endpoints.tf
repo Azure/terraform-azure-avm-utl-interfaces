@@ -46,7 +46,7 @@ locals {
               properties = {
                 privateIPAddress = lookup(ip_configuration, "private_ip_address", null)
                 groupId          = v.subresource_name
-                memberName       = lookup(ip_configuration, "member_name", "default")
+                memberName       = coalesce(ip_configuration.member_name, "default")
               }
             }
           ] : []
