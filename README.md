@@ -269,6 +269,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
   - `ip_configurations` - (Optional) A map of IP configurations to create on the private endpoint. If not specified the platform will create one. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
     - `name` - The name of the IP configuration.
     - `private_ip_address` - The private IP address of the IP configuration.
+    - `member_name` - The private IP configuration member name.
 
 Type:
 
@@ -302,6 +303,7 @@ map(object({
     ip_configurations = optional(map(object({
       name               = string
       private_ip_address = string
+      member_name        = optional(string)
     })), {})
   }))
 ```
