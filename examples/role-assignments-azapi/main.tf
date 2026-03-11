@@ -15,7 +15,9 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
-  role_assignment_definition_scope = azapi_resource.rg.id
+  parent_id        = azapi_resource.rg.id
+  this_resource_id = azapi_resource.rg.id
+  enable_telemetry = var.enable_telemetry
   role_assignments = {
     example = {
       principal_id               = data.azapi_client_config.current.object_id
@@ -27,11 +29,20 @@ module "avm_interfaces" {
 
 data "azapi_client_config" "current" {}
 
-resource "azapi_resource" "role_assignments" {
-  for_each = module.avm_interfaces.role_assignments_azapi
-
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
+moved {
+  from = azapi_resource.role_assignments
+  to   = module.avm_interfaces.azapi_resource.role_assignments
 }
+
+# resource "azapi_resource" "role_assignments" {
+#   for_each = module.avm_interfaces.role_assignments_azapi
+
+#   name      = each.value.name
+#   parent_id = azapi_resource.rg.id
+#   type      = each.value.type
+#   body      = each.value.body
+#   replace_triggers_refs = [
+#     "properties.principalId",
+#     "properties.roleDefinitionId",
+#   ]
+# }
