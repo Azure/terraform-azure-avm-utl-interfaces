@@ -19,7 +19,7 @@ resource "azapi_resource" "diagnostic_settings" {
   update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   list_unique_id_property = {
-    "body.properties.logs"    = "categoryGroup"
+    "body.properties.logs"    = "categoryGroup, category"
     "body.properties.metrics" = "category"
   }
   ignore_other_items_in_list = [
