@@ -27,7 +27,7 @@ resource "azapi_resource" "lock" {
     azapi_resource.private_endpoints,
     azapi_resource.role_assignments_private_endpoint,
     azapi_resource.role_assignments,
-    azapi_update_resource.diagnostic_settings,
+    azapi_resource.diagnostic_settings,
     #terraform_data.lock_dependency,
   ]
 }
