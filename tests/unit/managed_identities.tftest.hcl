@@ -11,6 +11,11 @@ mock_provider "azapi" {
 mock_provider "modtm" {}
 mock_provider "random" {}
 
+variables {
+  parent_id        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test"
+  this_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.KeyVault/vaults/kv-test"
+}
+
 run "no_input" {
   command = apply
 
