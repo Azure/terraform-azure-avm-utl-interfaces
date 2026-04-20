@@ -1,3 +1,9 @@
+variable "enable_telemetry" {
+  type     = bool
+  default  = true
+  nullable = false
+}
+
 variable "user_principal_type" {
   type        = string
   default     = "User"

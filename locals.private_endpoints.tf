@@ -25,7 +25,7 @@ locals {
   }
   # these computed names are used if the user does not provide their own for either the private endpoint, nic, or private service connection
   private_endpoint_computed_name = {
-    for k, v in var.private_endpoints : k => "pep-${try("${v.subresource_name}-", "")}${uuidv5("url", format("%s", var.private_endpoints_scope))}"
+    for k, v in var.private_endpoints : k => "pep-${try("${v.subresource_name}-", "")}${uuidv5("url", format("%s", var.this_resource_id))}"
   }
   private_endpoints = {
     for k, v in var.private_endpoints : k => {
@@ -54,7 +54,7 @@ locals {
             {
               name = v.private_service_connection_name != null ? v.private_service_connection_name : local.psc_computed_name[k]
               properties = {
-                privateLinkServiceId = var.private_endpoints_scope
+                privateLinkServiceId = var.this_resource_id
                 groupIds             = v.subresource_name != null ? [v.subresource_name] : null
               }
             }
@@ -66,7 +66,6 @@ locals {
       }
     }
   }
-  private_endpoints_type = "Microsoft.Network/privateEndpoints@2024-05-01"
   psc_computed_name = {
     for k, v in var.private_endpoints : k => v.name != null ? "pcon-${try("${v.subresource_name}-", "")}${v.name}" : "pcon-${local.private_endpoint_computed_name[k]}"
   }
