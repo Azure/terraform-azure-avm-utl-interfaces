@@ -8,7 +8,13 @@ locals {
   role_assignment_deterministic_name = {
     for k, v in var.role_assignments : k => {
       # mimic the random_uuid attribute value
-      result = uuidv5("url", format("%s%s", v.principal_id, local.role_assignments_role_name_to_resource_id[v.role_definition_id_or_name]))
+      # Fall back to the supplied value when it is already a full role definition resource ID
+      # (or when the lookup map is empty because role_assignment_definition_lookup_enabled is false).
+      result = uuidv5("url", format(
+        "%s%s",
+        v.principal_id,
+        lookup(local.role_assignments_role_name_to_resource_id, v.role_definition_id_or_name, v.role_definition_id_or_name)
+      ))
     }
   }
   # This is the deterministic name for role assignments for private endpoints.
@@ -16,10 +22,16 @@ locals {
   role_assignment_private_endpoint_deterministic_name = {
     for k, v in local.role_assignments_private_endpoint_azapi_keys_only : k => {
       # mimic the random_uuid attribute value
+      # Fall back to the supplied value when it is already a full role definition resource ID
+      # (or when the lookup map is empty because role_assignment_definition_lookup_enabled is false).
       result = uuidv5("url", format(
         "%s%s",
         var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].principal_id,
-        local.role_assignments_private_endpoint_role_definition_resource_ids[k]
+        lookup(
+          local.role_assignments_role_name_to_resource_id,
+          var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].role_definition_id_or_name,
+          var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].role_definition_id_or_name
+        )
       ))
     }
   }
