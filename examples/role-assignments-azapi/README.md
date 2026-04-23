@@ -3,7 +3,6 @@
 # role assignments interface example
 
 ```hcl
-
 resource "random_pet" "name" {
   length    = 2
   separator = "-"

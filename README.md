@@ -245,6 +245,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
 
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
+    - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
     - `role_definition_id_or_name` - The ID or name of the role definition to assign.
     - `principal_id` - The ID of the principal to assign the role to.
     - `description` - (Optional) A description of the role assignment.
@@ -277,6 +278,7 @@ Type:
 map(object({
     name = optional(string, null)
     role_assignments = optional(map(object({
+      name                                   = optional(string, null)
       role_definition_id_or_name             = string
       principal_id                           = string
       description                            = optional(string, null)
@@ -347,28 +349,13 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_role_assignment_name_use_random_uuid"></a> [role\_assignment\_name\_use\_random\_uuid](#input\_role\_assignment\_name\_use\_random\_uuid)
-
-Description: A control to use a random UUID for the role assignment name.  
-If set to false, the name will be a deterministic UUID based on the principal ID and role definition resource ID,  
-though this can cause issues with duplicate UUIDs as the scope of the role assignment is not taken into account.
-
-This is default to false to preserve existing behaviour.  
-However, we recommend this is set to true to avoid resources becoming re-created due to computed attribute changes in the resource graph.
-
-When this is set to true, you must not change the principal or role definition values in the `role_assignments` map after the initial creation of the role assignments as this will cause errors.  
-Instead, use a new key in the map with the new values and remove the old entry.
-
-Type: `bool`
-
-Default: `false`
-
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
 Description:   A map of role assignments to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.  
   Do not change principal or role definition values in this map after the initial creation of the role assignments as this will cause errors.  
   Instead, add a new entry to the map with a new key and remove the old entry.
 
+  - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
   - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment.
@@ -382,6 +369,7 @@ Type:
 
 ```hcl
 map(object({
+    name                                   = optional(string, null)
     role_definition_id_or_name             = string
     principal_id                           = string
     description                            = optional(string, null)

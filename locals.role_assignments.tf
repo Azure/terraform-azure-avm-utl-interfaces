@@ -3,43 +3,12 @@ locals {
   role_assignment_definition_lookup_enabled = var.role_assignment_definition_lookup_enabled && (
     length(var.role_assignments) > 0 || length(local.role_assignments_private_endpoint_azapi_keys_only) > 0
   )
-  # This is the deterministic name for role assignments.
-  # It is no longer recommended to use this but left in place for backwards compatibility.
-  role_assignment_deterministic_name = {
-    for k, v in var.role_assignments : k => {
-      # mimic the random_uuid attribute value
-      # Fall back to the supplied value when it is already a full role definition resource ID
-      # (or when the lookup map is empty because role_assignment_definition_lookup_enabled is false).
-      result = uuidv5("url", format(
-        "%s%s",
-        v.principal_id,
-        lookup(local.role_assignments_role_name_to_resource_id, v.role_definition_id_or_name, v.role_definition_id_or_name)
-      ))
-    }
-  }
-  # This is the deterministic name for role assignments for private endpoints.
-  # It is no longer recommended to use this but left in place for backwards compatibility.
-  role_assignment_private_endpoint_deterministic_name = {
-    for k, v in local.role_assignments_private_endpoint_azapi_keys_only : k => {
-      # mimic the random_uuid attribute value
-      # Fall back to the supplied value when it is already a full role definition resource ID
-      # (or when the lookup map is empty because role_assignment_definition_lookup_enabled is false).
-      result = uuidv5("url", format(
-        "%s%s",
-        var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].principal_id,
-        lookup(
-          local.role_assignments_role_name_to_resource_id,
-          var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].role_definition_id_or_name,
-          var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].role_definition_id_or_name
-        )
-      ))
-    }
-  }
   # Here is the role assignment data for the azapi_resource.
+  # The name is taken from the `name` attribute when supplied, otherwise a random UUID is generated.
   role_assignments_azapi = {
     for k, v in var.role_assignments : k => {
       type = local.role_assignments_type
-      name = lookup(random_uuid.role_assignment_name, k, local.role_assignment_deterministic_name[k]).result
+      name = coalesce(v.name, random_uuid.role_assignment_name[k].result)
       body = {
         properties = {
           principalId                        = v.principal_id
@@ -60,7 +29,10 @@ locals {
       pe_key         = v.pe_key
       assignment_key = v.assignment_key
       type           = local.role_assignments_type
-      name           = lookup(random_uuid.role_assignment_name_private_endpoint, k, local.role_assignment_private_endpoint_deterministic_name[k]).result
+      name = coalesce(
+        var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].name,
+        random_uuid.role_assignment_name_private_endpoint[k].result
+      )
       body = {
         properties = {
           principalId                        = var.private_endpoints[v.pe_key].role_assignments[v.assignment_key].principal_id

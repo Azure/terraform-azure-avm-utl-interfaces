@@ -6,3 +6,8 @@ rule "required_output_rmfr7" {
 rule "private_endpoints" {
   enabled = false
 }
+
+# disabled until this PR gets merged: https://github.com/Azure/tflint-ruleset-avm/pull/127
+rule "role_assignments" {
+  enabled = false
+}
