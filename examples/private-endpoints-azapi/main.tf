@@ -91,12 +91,9 @@ module "avm_interfaces" {
       }
     }
   }
-  private_endpoints_scope              = azapi_resource.keyvault.id
-  role_assignment_definition_scope     = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
-  role_assignment_name_use_random_uuid = true
+  private_endpoints_scope          = azapi_resource.keyvault.id
+  role_assignment_definition_scope = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
 }
-
-
 
 resource "azapi_resource" "private_endpoints" {
   for_each = module.avm_interfaces.private_endpoints_azapi

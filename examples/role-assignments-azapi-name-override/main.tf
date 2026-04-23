@@ -1,4 +1,3 @@
-
 resource "random_pet" "name" {
   length    = 2
   separator = "-"
@@ -12,13 +11,15 @@ resource "azapi_resource" "rg" {
 
 # In ordinary usage, the role_assignments attribute value would be set to var.role_assignments.
 # However, in this example, we are using a data source in the same module to retrieve the object id.
+# This example demonstrates supplying an explicit `name` for the role assignment, which overrides
+# the random UUID that the module would otherwise generate.
 module "avm_interfaces" {
   source = "../../"
 
-  role_assignment_definition_scope     = azapi_resource.rg.id
-  role_assignment_name_use_random_uuid = true
+  role_assignment_definition_scope = azapi_resource.rg.id
   role_assignments = {
     example = {
+      name                       = "11111111-1111-1111-1111-111111111111"
       principal_id               = data.azapi_client_config.current.object_id
       role_definition_id_or_name = "Storage Blob Data Owner"
       principal_type             = var.user_principal_type
