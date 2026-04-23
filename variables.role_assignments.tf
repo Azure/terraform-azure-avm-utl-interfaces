@@ -52,10 +52,10 @@ DESCRIPTION
     condition     = length(var.role_assignments) > 0 && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
   }
   validation {
-    error_message = "Each role_assignments `name`, when supplied, must be a valid GUID (e.g. 11111111-1111-1111-1111-111111111111)."
+    error_message = "Each role_assignments `name`, when supplied, must be a valid lowercase GUID (e.g. 11111111-1111-1111-1111-111111111111)."
     condition = alltrue([
       for ra in var.role_assignments :
-      ra.name == null || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", ra.name))
+      ra.name == null || can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ra.name))
     ])
   }
 }

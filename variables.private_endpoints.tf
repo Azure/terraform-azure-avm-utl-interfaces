@@ -74,11 +74,11 @@ variable "private_endpoints" {
     ]) && var.role_assignment_definition_lookup_enabled ? var.role_assignment_definition_scope != null : true
   }
   validation {
-    error_message = "Each private endpoint role assignment `name`, when supplied, must be a valid GUID (e.g. 11111111-1111-1111-1111-111111111111)."
+    error_message = "Each private endpoint role assignment `name`, when supplied, must be a valid lowercase GUID (e.g. 11111111-1111-1111-1111-111111111111)."
     condition = alltrue(flatten([
       for pe in var.private_endpoints : [
         for ra in pe.role_assignments :
-        ra.name == null || can(regex("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$", ra.name))
+        ra.name == null || can(regex("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", ra.name))
       ]
     ]))
   }
