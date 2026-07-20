@@ -27,7 +27,7 @@ data "azapi_client_config" "current" {}
 # This allows us to randomize the region for the resource group.
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
-  version = "0.3.0"
+  version = "0.12.0"
 
   enable_telemetry = var.enable_telemetry
 }
@@ -42,7 +42,7 @@ resource "random_integer" "region_index" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.4.2"
+  version = "0.4.3"
 }
 
 # This is required for resource modules
@@ -69,7 +69,7 @@ resource "azapi_resource" "umi" {
 # key vault & key
 module "key_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.10.0"
+  version = "0.10.2"
 
   location            = azapi_resource.rg.location
   name                = module.naming.key_vault.name_unique
