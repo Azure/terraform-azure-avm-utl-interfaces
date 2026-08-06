@@ -110,6 +110,24 @@ Type: `string`
 
 Default: `"vault.azure.net"`
 
+### <a name="input_customer_managed_key_v2"></a> [customer\_managed\_key\_v2](#input\_customer\_managed\_key\_v2)
+
+Description: An object containing the following attributes:
+
+- `key_vault_key_uri` - The full Key Vault or Managed HSM key URI, with an optional trailing key version.
+- `user_assigned_identity_client_id` - (Optional) The client ID of the user-assigned identity used to access the key.
+
+Type:
+
+```hcl
+object({
+    key_vault_key_uri                = string
+    user_assigned_identity_client_id = optional(string, null)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -400,6 +418,21 @@ Description: An object containing the following attributes:
 - `key_vault_uri` - The URI of the key vault.
 - `key_version` - The version of the key. Will be null if no key is provided.
 - `versionless_key_resource_id` - The resource ID of the key, without the version.
+- `versionless_key_uri` - The URI of the key, without the version.
+
+### <a name="output_customer_managed_key_azapi_v2"></a> [customer\_managed\_key\_azapi\_v2](#output\_customer\_managed\_key\_azapi\_v2)
+
+Description: An object containing the following attributes:
+
+- `identity_client_id` - The client ID of the user-assigned identity. Will be null if no user-assigned identity client ID is provided.
+- `identity_principal_id` - Always null because Variant 2 does not carry the identity resource ID required to resolve it.
+- `identity_tenant_id` - Always null because Variant 2 does not carry the identity resource ID required to resolve it.
+- `key_name` - The name of the key. Will be null if no key is provided.
+- `key_resource_id` - Always null because Variant 2 does not carry the vault resource ID required to construct it.
+- `key_uri` - The URI of the key, including the version. If the key version is not provided, this will be null.
+- `key_vault_uri` - The URI of the Key Vault or Managed HSM.
+- `key_version` - The version of the key. Will be null if the supplied URI is versionless.
+- `versionless_key_resource_id` - Always null because Variant 2 does not carry the vault resource ID required to construct it.
 - `versionless_key_uri` - The URI of the key, without the version.
 
 ### <a name="output_diagnostic_settings_azapi"></a> [diagnostic\_settings\_azapi](#output\_diagnostic\_settings\_azapi)

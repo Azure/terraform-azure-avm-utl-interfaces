@@ -1,4 +1,3 @@
-
 # These locals create the data for the azapi_resources from the var.diagnostic_settings variable
 locals {
   diagnostic_settings_azapi = {
