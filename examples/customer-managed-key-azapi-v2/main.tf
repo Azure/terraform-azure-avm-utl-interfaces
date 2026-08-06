@@ -98,8 +98,10 @@ module "avm_interfaces" {
   source = "../../"
 
   customer_managed_key_v2 = {
-    key_vault_key_uri                = module.key_vault.keys_resource_ids["cmk"].versionless_id
-    user_assigned_identity_client_id = azapi_resource.umi.output.properties.clientId
+    key_vault_key_uri = module.key_vault.keys_resource_ids["cmk"].versionless_id
+    user_assigned_identity = {
+      client_id = azapi_resource.umi.output.properties.clientId
+    }
   }
 }
 

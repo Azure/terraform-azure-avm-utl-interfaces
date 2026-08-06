@@ -115,14 +115,17 @@ Default: `"vault.azure.net"`
 Description: An object containing the following attributes:
 
 - `key_vault_key_uri` - The full Key Vault or Managed HSM key URI, with an optional trailing key version.
-- `user_assigned_identity_client_id` - (Optional) The client ID of the user-assigned identity used to access the key.
+- `user_assigned_identity` - (Optional) An object containing the client ID of the user-assigned identity used to access the key.
+  - `client_id` - The client ID of the user-assigned identity.
 
 Type:
 
 ```hcl
 object({
-    key_vault_key_uri                = string
-    user_assigned_identity_client_id = optional(string, null)
+    key_vault_key_uri = string
+    user_assigned_identity = optional(object({
+      client_id = string
+    }), null)
   })
 ```
 

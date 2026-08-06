@@ -15,8 +15,10 @@ run "versionless_key_vault_uri" {
 
   variables {
     customer_managed_key_v2 = {
-      key_vault_key_uri                = "https://example.vault.azure.net/keys/cmk"
-      user_assigned_identity_client_id = "11111111-1111-1111-1111-111111111111"
+      key_vault_key_uri = "https://example.vault.azure.net/keys/cmk"
+      user_assigned_identity = {
+        client_id = "11111111-1111-1111-1111-111111111111"
+      }
     }
   }
 
