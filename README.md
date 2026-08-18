@@ -230,7 +230,7 @@ Description:   Controls the resource lock configuration for this resource. The f
 
   - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
   - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-  - `notes` - (Optional) Notes about the lock. This value is passed to the lock resource.
+  - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
 
 Type:
 
@@ -280,7 +280,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
   - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
-    - `notes` - (Optional) Notes about the lock. This value is passed to the lock resource.
+    - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
   - `subresource_name` - The name of the sub resource for the private endpoint.
