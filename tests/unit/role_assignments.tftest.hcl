@@ -29,6 +29,11 @@ run "role_assignment_resource_id_with_random_uuid" {
     error_message = "Role assignment roleDefinitionId should pass through the full resource ID."
     condition     = output.role_assignments_azapi["ra1"].body.properties.roleDefinitionId == "/providers/Microsoft.Authorization/roleDefinitions/2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
   }
+
+  assert {
+    error_message = "An omitted role assignment name should continue to use a generated name."
+    condition     = output.role_assignments_azapi["ra1"].name != null && output.role_assignments_azapi["ra1"].name != ""
+  }
 }
 
 # When the optional `name` attribute is supplied, it should override the random UUID.
@@ -75,6 +80,11 @@ run "private_endpoint_role_assignment_resource_id_with_random_uuid" {
   assert {
     error_message = "Private endpoint role assignment roleDefinitionId should pass through the full resource ID."
     condition     = output.role_assignments_private_endpoint_azapi["pe1-ra1"].body.properties.roleDefinitionId == "/providers/Microsoft.Authorization/roleDefinitions/2a2b9908-6ea1-4ae2-8e65-a410df84e7d1"
+  }
+
+  assert {
+    error_message = "An omitted private endpoint role assignment name should continue to use a generated name."
+    condition     = output.role_assignments_private_endpoint_azapi["pe1-ra1"].name != null && output.role_assignments_private_endpoint_azapi["pe1-ra1"].name != ""
   }
 }
 

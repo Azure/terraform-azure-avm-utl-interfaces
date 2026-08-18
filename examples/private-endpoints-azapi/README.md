@@ -77,8 +77,9 @@ module "avm_interfaces" {
       private_dns_zone_resource_ids = [azapi_resource.private_dns_zone.id]
       subresource_name              = "vault"
       lock = {
-        name = "lock-${random_pet.name.id}"
-        kind = "CanNotDelete"
+        name  = "lock-${random_pet.name.id}"
+        kind  = "CanNotDelete"
+        notes = "Protect this private endpoint from accidental deletion."
       }
       role_assignments = {
         example = {

@@ -26,7 +26,8 @@ module "avm_interfaces" {
   source = "../../"
 
   lock = {
-    kind = "CanNotDelete"
+    kind  = "CanNotDelete"
+    notes = "Protect this resource group from accidental deletion."
   }
 }
 
