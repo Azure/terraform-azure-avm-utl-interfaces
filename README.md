@@ -110,6 +110,27 @@ Type: `string`
 
 Default: `"vault.azure.net"`
 
+### <a name="input_customer_managed_key_v2"></a> [customer\_managed\_key\_v2](#input\_customer\_managed\_key\_v2)
+
+Description: An object containing the following attributes:
+
+- `key_vault_key_uri` - The full Key Vault or Managed HSM key URI, with an optional trailing key version.
+- `user_assigned_identity` - (Optional) An object containing the client ID of the user-assigned identity used to access the key.
+  - `client_id` - The client ID of the user-assigned identity.
+
+Type:
+
+```hcl
+object({
+    key_vault_key_uri = string
+    user_assigned_identity = optional(object({
+      client_id = string
+    }), null)
+  })
+```
+
+Default: `null`
+
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
 Description:   A map of diagnostic settings to create. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
@@ -209,13 +230,15 @@ Description:   Controls the resource lock configuration for this resource. The f
 
   - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
   - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+  - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
 
 Type:
 
 ```hcl
 object({
-    kind = string
-    name = optional(string, null)
+    kind  = string
+    name  = optional(string, null)
+    notes = optional(string, null)
   })
 ```
 
@@ -257,6 +280,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
   - `lock` - (Optional) This module does not do anything with this, it is used by the parent module to create locks assignments.
     - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
     - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+    - `notes` - (Optional) Notes about the lock. This value maps to `Microsoft.Authorization/locks.properties.notes`.
   - `tags` - (Optional) A mapping of tags to assign to the private endpoint.
   - `subnet_resource_id` - The resource ID of the subnet to deploy the private endpoint in.
   - `subresource_name` - The name of the sub resource for the private endpoint.
@@ -289,8 +313,9 @@ map(object({
       principal_type                         = optional(string, null)
     })), {})
     lock = optional(object({
-      kind = string
-      name = optional(string, null)
+      kind  = string
+      name  = optional(string, null)
+      notes = optional(string, null)
     }), null)
     tags                                    = optional(map(string), null)
     subnet_resource_id                      = string
@@ -400,6 +425,21 @@ Description: An object containing the following attributes:
 - `key_vault_uri` - The URI of the key vault.
 - `key_version` - The version of the key. Will be null if no key is provided.
 - `versionless_key_resource_id` - The resource ID of the key, without the version.
+- `versionless_key_uri` - The URI of the key, without the version.
+
+### <a name="output_customer_managed_key_azapi_v2"></a> [customer\_managed\_key\_azapi\_v2](#output\_customer\_managed\_key\_azapi\_v2)
+
+Description: An object containing the following attributes:
+
+- `identity_client_id` - The client ID of the user-assigned identity. Will be null if no user-assigned identity client ID is provided.
+- `identity_principal_id` - Always null because Variant 2 does not carry the identity resource ID required to resolve it.
+- `identity_tenant_id` - Always null because Variant 2 does not carry the identity resource ID required to resolve it.
+- `key_name` - The name of the key. Will be null if no key is provided.
+- `key_resource_id` - Always null because Variant 2 does not carry the vault resource ID required to construct it.
+- `key_uri` - The URI of the key, including the version. If the key version is not provided, this will be null.
+- `key_vault_uri` - The URI of the Key Vault or Managed HSM.
+- `key_version` - The version of the key. Will be null if the supplied URI is versionless.
+- `versionless_key_resource_id` - Always null because Variant 2 does not carry the vault resource ID required to construct it.
 - `versionless_key_uri` - The URI of the key, without the version.
 
 ### <a name="output_diagnostic_settings_azapi"></a> [diagnostic\_settings\_azapi](#output\_diagnostic\_settings\_azapi)

@@ -1,1 +1,3 @@
-# role assignments interface example
+# Lock interface example
+
+This example creates a resource lock with optional notes.
