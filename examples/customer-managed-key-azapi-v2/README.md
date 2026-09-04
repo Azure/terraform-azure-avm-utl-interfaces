@@ -132,6 +132,7 @@ resource "azapi_resource" "registry" {
       name = "Premium"
     }
   }
+
   identity {
     type         = "UserAssigned"
     identity_ids = [azapi_resource.umi.id]
