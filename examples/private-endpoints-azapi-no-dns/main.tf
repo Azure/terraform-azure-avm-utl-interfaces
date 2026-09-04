@@ -97,8 +97,6 @@ module "avm_interfaces" {
   role_assignment_definition_scope        = "/subscriptions/${data.azapi_client_config.current.subscription_id}"
 }
 
-
-
 resource "azapi_resource" "private_endpoints" {
   for_each = module.avm_interfaces.private_endpoints_azapi
 
