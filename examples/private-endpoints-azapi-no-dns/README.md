@@ -78,6 +78,7 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  enable_telemetry = false
   private_endpoints = {
     example = {
       name                            = "pe-${azapi_resource.keyvault.name}"
