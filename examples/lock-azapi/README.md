@@ -32,6 +32,7 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
+  enable_telemetry = false
   lock = {
     kind  = "CanNotDelete"
     notes = "Protect this resource group from accidental deletion."

@@ -66,6 +66,7 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  enable_telemetry = false
   private_endpoints = {
     example = {
       subnet_resource_id            = local.subnet_resource_id

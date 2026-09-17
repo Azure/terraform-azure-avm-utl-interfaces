@@ -32,6 +32,7 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
+  enable_telemetry = false
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = []
