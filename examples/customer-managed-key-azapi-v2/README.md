@@ -34,7 +34,7 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.3.0"
 
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "random_integer" "region_index" {
@@ -73,7 +73,7 @@ module "key_vault" {
   name                = module.naming.key_vault.name_unique
   resource_group_name = azapi_resource.rg.name
   tenant_id           = data.azapi_client_config.current.tenant_id
-  enable_telemetry    = false
+  enable_telemetry    = var.enable_telemetry
   keys = {
     cmk = {
       name     = "cmk"
@@ -111,7 +111,7 @@ module "avm_interfaces" {
       client_id = azapi_resource.umi.output.properties.clientId
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "azapi_resource" "registry" {
@@ -180,7 +180,7 @@ Description: Enable telemetry for the module.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 

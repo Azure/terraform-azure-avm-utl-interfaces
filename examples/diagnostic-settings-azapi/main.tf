@@ -82,7 +82,7 @@ module "avm_interfaces" {
       workspace_resource_id          = azapi_resource.law.id
     }
   }
-  enable_telemetry = false
+  enable_telemetry = var.enable_telemetry
 }
 
 resource "azapi_resource" "diag_settings" {
