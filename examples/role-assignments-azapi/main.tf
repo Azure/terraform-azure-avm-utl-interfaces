@@ -14,7 +14,7 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
-  enable_telemetry                 = false
+  enable_telemetry                 = var.enable_telemetry
   role_assignment_definition_scope = azapi_resource.rg.id
   role_assignments = {
     example = {
