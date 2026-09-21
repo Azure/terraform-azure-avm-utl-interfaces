@@ -180,7 +180,7 @@ Description: Enable telemetry for the module.
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 
