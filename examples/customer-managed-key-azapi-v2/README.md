@@ -193,11 +193,11 @@ Default: `"eastus"`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 
-Description: The principal type used for the example's Key Vault administrator role assignment.
+Description: The authenticated principal's type for role assignments. Set to User or ServicePrincipal to override; null lets Azure determine the type.
 
 Type: `string`
 
-Default: `"User"`
+Default: `null`
 
 ## Outputs
 

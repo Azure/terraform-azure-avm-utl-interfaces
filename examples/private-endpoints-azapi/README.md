@@ -228,11 +228,11 @@ Default: `"eastus"`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 
-Description: This is so we can set the correct value in the CI/CD pipeline. In a real-world scenario, this would be set to 'User' or 'ServicePrincipal' based on the principal type you are assigning the role to.
+Description: The authenticated principal's type for role assignments. Set to User or ServicePrincipal to override; null lets Azure determine the type.
 
 Type: `string`
 
-Default: `"User"`
+Default: `null`
 
 ## Outputs
 
