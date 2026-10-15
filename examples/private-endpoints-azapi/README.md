@@ -157,10 +157,11 @@ resource "azapi_resource" "private_dns_zone_groups" {
 resource "azapi_resource" "private_endpoint_role_assignments" {
   for_each = module.avm_interfaces.role_assignments_private_endpoint_azapi
 
-  name      = each.value.name
-  parent_id = azapi_resource.private_endpoints[each.value.pe_key].id
-  type      = each.value.type
-  body      = each.value.body
+  name                 = each.value.name
+  parent_id            = azapi_resource.private_endpoints[each.value.pe_key].id
+  type                 = each.value.type
+  body                 = each.value.body
+  ignore_null_property = true
   retry = {
     error_message_regex  = ["ScopeLocked"]
     interval_seconds     = 15

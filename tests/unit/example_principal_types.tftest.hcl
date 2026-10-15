@@ -52,6 +52,11 @@ run "role_assignment_example_infers_principal_type" {
     condition     = azapi_resource.role_assignments["example"].body.properties.principalType == null
     error_message = "The role assignment example must let Azure infer the authenticated principal's type by default."
   }
+
+  assert {
+    condition     = azapi_resource.role_assignments["example"].ignore_null_property
+    error_message = "The role assignment example must omit null properties to avoid drift from Azure's inferred principal type."
+  }
 }
 
 run "role_assignment_example_accepts_user" {
@@ -99,6 +104,11 @@ run "named_role_assignment_example_infers_principal_type" {
     condition     = azapi_resource.role_assignments["example"].body.properties.principalType == null
     error_message = "The named role assignment example must let Azure infer the authenticated principal's type by default."
   }
+
+  assert {
+    condition     = azapi_resource.role_assignments["example"].ignore_null_property
+    error_message = "The named role assignment example must omit null properties to avoid drift from Azure's inferred principal type."
+  }
 }
 
 run "private_endpoint_example_infers_principal_type" {
@@ -116,5 +126,13 @@ run "private_endpoint_example_infers_principal_type" {
   assert {
     condition     = azapi_resource.private_endpoint_role_assignments["example-example2"].body.properties.principalType == null
     error_message = "The private endpoint's role-ID assignment must let Azure infer the authenticated principal's type by default."
+  }
+
+  assert {
+    condition = (
+      azapi_resource.private_endpoint_role_assignments["example-example"].ignore_null_property &&
+      azapi_resource.private_endpoint_role_assignments["example-example2"].ignore_null_property
+    )
+    error_message = "Private endpoint role assignments must omit null properties to avoid drift from Azure's inferred principal type."
   }
 }
