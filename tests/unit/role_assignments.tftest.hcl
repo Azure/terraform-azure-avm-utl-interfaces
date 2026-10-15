@@ -1,13 +1,13 @@
 mock_provider "azapi" {
   mock_data "azapi_client_config" {
     defaults = {
-      subscription_id = "00000000-0000-0000-0000-000000000000"
-      tenant_id       = "00000000-0000-0000-0000-000000000000"
+      subscription_id          = "00000000-0000-0000-0000-000000000000"
+      tenant_id                = "00000000-0000-0000-0000-000000000000"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
     }
   }
 }
 
-mock_provider "modtm" {}
 mock_provider "random" {}
 
 # A full role definition resource ID supplied as role_definition_id_or_name should
@@ -23,6 +23,7 @@ run "role_assignment_resource_id_with_random_uuid" {
         principal_id               = "00000000-0000-0000-0000-000000000001"
       }
     }
+    location = "eastus"
   }
 
   assert {
@@ -49,6 +50,7 @@ run "role_assignment_name_override" {
         principal_id               = "00000000-0000-0000-0000-000000000001"
       }
     }
+    location = "eastus"
   }
 
   assert {
@@ -75,6 +77,7 @@ run "private_endpoint_role_assignment_resource_id_with_random_uuid" {
         }
       }
     }
+    location = "eastus"
   }
 
   assert {
@@ -108,6 +111,7 @@ run "private_endpoint_role_assignment_name_override" {
         }
       }
     }
+    location = "eastus"
   }
 
   assert {

@@ -1,13 +1,13 @@
 mock_provider "azapi" {
   mock_data "azapi_client_config" {
     defaults = {
-      subscription_id = "00000000-0000-0000-0000-000000000000"
-      tenant_id       = "00000000-0000-0000-0000-000000000000"
+      subscription_id          = "00000000-0000-0000-0000-000000000000"
+      tenant_id                = "00000000-0000-0000-0000-000000000000"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
     }
   }
 }
 
-mock_provider "modtm" {}
 mock_provider "random" {}
 
 run "versionless_key_vault_uri" {
@@ -20,6 +20,7 @@ run "versionless_key_vault_uri" {
         client_id = "11111111-1111-1111-1111-111111111111"
       }
     }
+    location = "eastus"
   }
 
   assert {
@@ -55,6 +56,7 @@ run "versioned_key_vault_uri" {
     customer_managed_key_v2 = {
       key_vault_key_uri = "https://example.vault.azure.net/keys/cmk/0123456789abcdef"
     }
+    location = "eastus"
   }
 
   assert {
@@ -80,6 +82,7 @@ run "managed_hsm_uri" {
     customer_managed_key_v2 = {
       key_vault_key_uri = "https://example.managedhsm.azure.net/keys/cmk/version"
     }
+    location = "eastus"
   }
 
   assert {
@@ -95,6 +98,7 @@ run "sovereign_cloud_uri" {
     customer_managed_key_v2 = {
       key_vault_key_uri = "https://example.vault.usgovcloudapi.net/keys/cmk"
     }
+    location = "eastus"
   }
 
   assert {

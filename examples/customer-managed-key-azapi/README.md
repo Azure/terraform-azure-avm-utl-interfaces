@@ -115,6 +115,7 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   customer_managed_key = {
     key_name              = "cmk"
     key_vault_resource_id = module.key_vault.resource_id
@@ -209,13 +210,21 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+### <a name="input_location"></a> [location](#input\_location)
 
-Description: This is so we can set the correct value in the CI/CD pipeline. In a real-world scenario, this would be set to 'User' or 'ServicePrincipal' based on the principal type you are assigning the role to.
+Description: The Azure region for this module's resources or telemetry deployment.
 
 Type: `string`
 
-Default: `"User"`
+Default: `"eastus"`
+
+### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+
+Description: The authenticated principal's type for role assignments. Set to User or ServicePrincipal to override; null lets Azure determine the type.
+
+Type: `string`
+
+Default: `null`
 
 ## Outputs
 

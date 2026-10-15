@@ -24,6 +24,7 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
+  location                         = var.location
   enable_telemetry                 = var.enable_telemetry
   role_assignment_definition_scope = azapi_resource.rg.id
   role_assignments = {
@@ -41,10 +42,11 @@ data "azapi_client_config" "current" {}
 resource "azapi_resource" "role_assignments" {
   for_each = module.avm_interfaces.role_assignments_azapi
 
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
+  name                 = each.value.name
+  parent_id            = azapi_resource.rg.id
+  type                 = each.value.type
+  body                 = each.value.body
+  ignore_null_property = true
 }
 ```
 
@@ -87,13 +89,21 @@ Type: `bool`
 
 Default: `true`
 
-### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+### <a name="input_location"></a> [location](#input\_location)
 
-Description: This is so we can set the correct value in the CI/CD pipeline. In a real-world scenario, this would be set to 'User' or 'ServicePrincipal' based on the principal type you are assigning the role to.
+Description: The Azure region for this module's resources or telemetry deployment.
 
 Type: `string`
 
-Default: `"User"`
+Default: `"eastus"`
+
+### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
+
+Description: The authenticated principal's type for role assignments. Set to User or ServicePrincipal to override; null lets Azure determine the type.
+
+Type: `string`
+
+Default: `null`
 
 ## Outputs
 

@@ -77,6 +77,7 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   diagnostic_settings_v2 = {
     example = {
       name = "tolaw"
@@ -139,6 +140,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ## Outputs
 

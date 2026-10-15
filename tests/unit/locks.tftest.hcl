@@ -1,13 +1,13 @@
 mock_provider "azapi" {
   mock_data "azapi_client_config" {
     defaults = {
-      subscription_id = "00000000-0000-0000-0000-000000000000"
-      tenant_id       = "00000000-0000-0000-0000-000000000000"
+      subscription_id          = "00000000-0000-0000-0000-000000000000"
+      tenant_id                = "00000000-0000-0000-0000-000000000000"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
     }
   }
 }
 
-mock_provider "modtm" {}
 mock_provider "random" {}
 
 run "top_level_lock_without_notes" {
@@ -17,6 +17,7 @@ run "top_level_lock_without_notes" {
     lock = {
       kind = "CanNotDelete"
     }
+    location = "eastus"
   }
 
   assert {
@@ -33,6 +34,7 @@ run "top_level_lock_with_notes" {
       kind  = "ReadOnly"
       notes = "Managed by Terraform."
     }
+    location = "eastus"
   }
 
   assert {
@@ -54,6 +56,7 @@ run "private_endpoint_lock_without_notes" {
         }
       }
     }
+    location = "eastus"
   }
 
   assert {
@@ -91,6 +94,7 @@ run "private_endpoint_lock_with_notes" {
         }
       }
     }
+    location = "eastus"
   }
 
   assert {

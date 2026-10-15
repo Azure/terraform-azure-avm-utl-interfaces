@@ -16,6 +16,7 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
+  location                         = var.location
   enable_telemetry                 = var.enable_telemetry
   role_assignment_definition_scope = azapi_resource.rg.id
   role_assignments = {
@@ -33,8 +34,9 @@ data "azapi_client_config" "current" {}
 resource "azapi_resource" "role_assignments" {
   for_each = module.avm_interfaces.role_assignments_azapi
 
-  name      = each.value.name
-  parent_id = azapi_resource.rg.id
-  type      = each.value.type
-  body      = each.value.body
+  name                 = each.value.name
+  parent_id            = azapi_resource.rg.id
+  type                 = each.value.type
+  body                 = each.value.body
+  ignore_null_property = true
 }

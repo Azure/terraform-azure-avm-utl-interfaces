@@ -72,6 +72,7 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   diagnostic_settings_v2 = {
     example = {
       name = "tolaw"
