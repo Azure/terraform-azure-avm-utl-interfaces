@@ -24,6 +24,7 @@ resource "azapi_resource" "rg" {
 module "avm_interfaces" {
   source = "../../"
 
+  location                         = var.location
   enable_telemetry                 = var.enable_telemetry
   role_assignment_definition_scope = azapi_resource.rg.id
   role_assignments = {
@@ -86,6 +87,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 

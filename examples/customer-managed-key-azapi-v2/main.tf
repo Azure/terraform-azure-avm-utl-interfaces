@@ -98,6 +98,7 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   customer_managed_key_v2 = {
     key_vault_key_uri = module.key_vault.keys_resource_ids["cmk"].versionless_id
     user_assigned_identity = {

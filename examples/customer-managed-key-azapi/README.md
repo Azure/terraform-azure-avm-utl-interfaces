@@ -115,6 +115,7 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   customer_managed_key = {
     key_name              = "cmk"
     key_vault_resource_id = module.key_vault.resource_id
@@ -208,6 +209,14 @@ Description: Enable telemetry for the module
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 

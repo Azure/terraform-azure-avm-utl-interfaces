@@ -105,6 +105,7 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   customer_managed_key_v2 = {
     key_vault_key_uri = module.key_vault.keys_resource_ids["cmk"].versionless_id
     user_assigned_identity = {
@@ -181,6 +182,14 @@ Description: Enable telemetry for the module.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ### <a name="input_user_principal_type"></a> [user\_principal\_type](#input\_user\_principal\_type)
 

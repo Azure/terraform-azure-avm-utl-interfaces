@@ -110,6 +110,7 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
+  location = var.location
   customer_managed_key = {
     key_name              = "cmk"
     key_vault_resource_id = module.key_vault.resource_id

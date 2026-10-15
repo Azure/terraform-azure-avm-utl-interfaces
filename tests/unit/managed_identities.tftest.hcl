@@ -1,14 +1,14 @@
 mock_provider "azapi" {
   mock_data "azapi_client_config" {
     defaults = {
-      subscription_id = "00000000-0000-0000-0000-000000000000"
-      tenant_id       = "00000000-0000-0000-0000-000000000000"
+      subscription_id          = "00000000-0000-0000-0000-000000000000"
+      tenant_id                = "00000000-0000-0000-0000-000000000000"
+      subscription_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000"
     }
 
   }
 }
 
-mock_provider "modtm" {}
 mock_provider "random" {}
 
 run "no_input" {
@@ -17,6 +17,9 @@ run "no_input" {
   assert {
     error_message = "Managed identity output should be null."
     condition     = output.managed_identities_azapi == null
+  }
+  variables {
+    location = "eastus"
   }
 }
 
@@ -27,6 +30,7 @@ run "system_assigned" {
     managed_identities = {
       system_assigned = true
     }
+    location = "eastus"
   }
 
   assert {
@@ -49,6 +53,7 @@ run "user_assigned" {
         "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ua1",
       ]
     }
+    location = "eastus"
   }
 
   assert {
@@ -74,6 +79,7 @@ run "system_user_assigned" {
         "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/ua1",
       ]
     }
+    location = "eastus"
   }
 
   assert {

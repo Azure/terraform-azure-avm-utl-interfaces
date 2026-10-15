@@ -78,6 +78,7 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
   private_endpoints = {
     example = {
@@ -156,6 +157,14 @@ If it is set to false, then no telemetry will be collected.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
 
 ## Outputs
 

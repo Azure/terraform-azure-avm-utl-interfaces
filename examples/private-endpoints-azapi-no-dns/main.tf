@@ -73,6 +73,7 @@ locals {
 module "avm_interfaces" {
   source = "../../"
 
+  location         = var.location
   enable_telemetry = var.enable_telemetry
   private_endpoints = {
     example = {

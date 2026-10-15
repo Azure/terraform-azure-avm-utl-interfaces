@@ -9,3 +9,10 @@ variable "user_principal_type" {
   default     = "User"
   description = "The principal type used for the example's Key Vault administrator role assignment."
 }
+
+variable "location" {
+  type        = string
+  default     = "eastus"
+  description = "The Azure region for this module's resources or telemetry deployment."
+  nullable    = false
+}
