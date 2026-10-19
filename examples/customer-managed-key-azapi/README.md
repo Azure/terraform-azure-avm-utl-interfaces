@@ -80,7 +80,7 @@ resource "azapi_resource" "umi" {
 # key vault & key
 module "key_vault" {
   source    = "Azure/avm-res-keyvault-vault/azurerm"
-  version   = "0.10.0"
+  version   = "0.12.0"
   providers = { modtm = modtm }
 
   location            = azapi_resource.rg.location
@@ -252,7 +252,7 @@ Version:
 
 Source: Azure/avm-res-keyvault-vault/azurerm
 
-Version: 0.10.0
+Version: 0.12.0
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
