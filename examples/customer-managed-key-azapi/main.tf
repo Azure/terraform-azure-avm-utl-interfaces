@@ -10,6 +10,7 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
+    # tflint-ignore: terraform_unused_required_providers
     modtm = {
       source  = "registry.terraform.io/azure/modtm"
       version = "~> 0.3"
@@ -74,9 +75,8 @@ resource "azapi_resource" "umi" {
 
 # key vault & key
 module "key_vault" {
-  source    = "Azure/avm-res-keyvault-vault/azurerm"
-  version   = "0.10.0"
-  providers = { modtm = modtm }
+  source  = "Azure/avm-res-keyvault-vault/azurerm"
+  version = "0.10.0"
 
   location            = azapi_resource.rg.location
   name                = module.naming.key_vault.name_unique
