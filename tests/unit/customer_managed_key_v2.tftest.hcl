@@ -10,7 +10,23 @@ mock_provider "azapi" {
 
 mock_provider "random" {}
 
-run "versionless_key_vault_uri" {
+run "null_customer_managed_key_v2" {
+  command = apply
+
+  variables {
+    location = "eastus"
+  }
+
+  assert {
+    condition = (
+      output.customer_managed_key_azapi_v2.identity_client_id == null
+      && output.customer_managed_key_azapi_v2.key_vault_uri == null
+    )
+    error_message = "A null CMKv2 object should produce null CMK output values."
+  }
+}
+
+run "valid_user_assigned_identity_client_id" {
   command = apply
 
   variables {
@@ -49,7 +65,7 @@ run "versionless_key_vault_uri" {
   }
 }
 
-run "versioned_key_vault_uri" {
+run "omitted_user_assigned_identity" {
   command = apply
 
   variables {
@@ -73,6 +89,29 @@ run "versioned_key_vault_uri" {
     condition     = output.customer_managed_key_azapi_v2.versionless_key_uri == "https://example.vault.azure.net/keys/cmk"
     error_message = "The trailing key version should be removed from versionless_key_uri."
   }
+
+  assert {
+    condition     = output.customer_managed_key_azapi_v2.identity_client_id == null
+    error_message = "An omitted user-assigned identity should produce a null identity client ID."
+  }
+}
+
+run "invalid_user_assigned_identity_client_id" {
+  command = plan
+
+  variables {
+    customer_managed_key_v2 = {
+      key_vault_key_uri = "https://example.vault.azure.net/keys/cmk"
+      user_assigned_identity = {
+        client_id = "not-a-guid"
+      }
+    }
+    location = "eastus"
+  }
+
+  expect_failures = [
+    var.customer_managed_key_v2,
+  ]
 }
 
 run "managed_hsm_uri" {
