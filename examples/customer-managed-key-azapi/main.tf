@@ -116,7 +116,6 @@ module "key_vault" {
 module "avm_interfaces" {
   source = "../../"
 
-  location = var.location
   customer_managed_key = {
     key_name              = "cmk"
     key_vault_resource_id = module.key_vault.resource_id
@@ -125,6 +124,7 @@ module "avm_interfaces" {
     }
   }
   enable_telemetry = var.enable_telemetry
+  location         = var.location
   managed_identities = {
     system_assigned = false
     user_assigned_resource_ids = [
