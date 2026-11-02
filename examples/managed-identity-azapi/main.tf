@@ -32,8 +32,8 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
-  location         = var.location
   enable_telemetry = var.enable_telemetry
+  location         = var.location
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = []
