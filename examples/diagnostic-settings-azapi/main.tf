@@ -72,7 +72,6 @@ resource "azapi_resource" "stg" {
 module "avm_interfaces" {
   source = "../../"
 
-  location = var.location
   diagnostic_settings_v2 = {
     example = {
       name = "tolaw"
@@ -84,6 +83,7 @@ module "avm_interfaces" {
     }
   }
   enable_telemetry = var.enable_telemetry
+  location         = var.location
 }
 
 resource "azapi_resource" "diag_settings" {
