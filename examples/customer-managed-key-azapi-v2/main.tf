@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~> 1.9"
+  required_version = ">= 1.11, < 2.0"
 
   required_providers {
     azapi = {
@@ -9,11 +9,6 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
-    }
-    # tflint-ignore: terraform_unused_required_providers
-    modtm = {
-      source  = "registry.terraform.io/azure/modtm"
-      version = "~> 0.3"
     }
     random = {
       source  = "hashicorp/random"
@@ -66,20 +61,19 @@ resource "azapi_resource" "umi" {
 
 module "key_vault" {
   source  = "Azure/avm-res-keyvault-vault/azurerm"
-  version = "0.10.0"
+  version = "0.13.0"
 
-  location            = azapi_resource.rg.location
-  name                = module.naming.key_vault.name_unique
-  resource_group_name = azapi_resource.rg.name
-  tenant_id           = data.azapi_client_config.current.tenant_id
-  enable_telemetry    = var.enable_telemetry
+  location         = azapi_resource.rg.location
+  name             = module.naming.key_vault.name_unique
+  parent_id        = azapi_resource.rg.id
+  tenant_id        = data.azapi_client_config.current.tenant_id
+  enable_telemetry = var.enable_telemetry
   keys = {
     cmk = {
       name     = "cmk"
       key_type = "RSA"
       key_size = 4096
       key_opts = ["wrapKey", "unwrapKey", "sign", "verify", "encrypt", "decrypt"]
-      enabled  = true
       role_assignments = {
         umi = {
           principal_id               = azapi_resource.umi.output.properties.principalId
