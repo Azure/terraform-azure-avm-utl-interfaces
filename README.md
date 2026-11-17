@@ -274,7 +274,7 @@ Description:   A map of private endpoints to create. The map key is deliberately
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
     - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
-    - `role_definition_id_or_name` - The ID or name of the role definition to assign.
+    - `role_definition_id_or_name` - The resource ID, GUID, or name of the role definition to assign. Names are resolved case-insensitively when lookup is enabled. Tenant-form resource IDs are qualified when `role_assignment_definition_scope` identifies a subscription; already subscription-qualified IDs are preserved.
     - `principal_id` - The ID of the principal to assign the role to.
     - `description` - (Optional) A description of the role assignment.
     - `skip_service_principal_aad_check` - (Optional) Whether to skip the AAD check for service principals.
@@ -371,7 +371,7 @@ Default: `true`
 
 ### <a name="input_role_assignment_definition_scope"></a> [role\_assignment\_definition\_scope](#input\_role\_assignment\_definition\_scope)
 
-Description: The scope at which the role assignments should be created. Used to look up role definitions by role name.
+Description: The scope at which the role assignments should be created. Used to look up role definitions by role name and to qualify tenant-form role definition IDs when the scope identifies a subscription.
 
 Must be specified when `role_assignments` are defined.
 
@@ -386,7 +386,7 @@ Description:   A map of role assignments to create. The map key is deliberately 
   Instead, add a new entry to the map with a new key and remove the old entry.
 
   - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
-  - `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+  - `role_definition_id_or_name` - The resource ID, GUID, or name of the role definition to assign to the principal. Names are resolved case-insensitively when lookup is enabled. Tenant-form resource IDs are qualified when `role_assignment_definition_scope` identifies a subscription; already subscription-qualified IDs are preserved.
   - `principal_id` - The ID of the principal to assign the role to.
   - `description` - (Optional) The description of the role assignment.
   - `skip_service_principal_aad_check` - (Optional) No effect when using AzAPI.
