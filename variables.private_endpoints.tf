@@ -40,7 +40,7 @@ variable "private_endpoints" {
   - `name` - (Optional) The name of the private endpoint. One will be generated if not set.
   - `role_assignments` - (Optional) This module does not do anything with this, it is used by the parent module to create role assignments.
     - `name` - (Optional) The name of the role assignment. If not set, a random UUID will be generated. Changing this forces the creation of a new resource.
-    - `role_definition_id_or_name` - The ID or name of the role definition to assign.
+    - `role_definition_id_or_name` - The resource ID, GUID, or name of the role definition to assign. Names are resolved case-insensitively when lookup is enabled. Tenant-form resource IDs are qualified when `role_assignment_definition_scope` identifies a subscription; already subscription-qualified IDs are preserved.
     - `principal_id` - The ID of the principal to assign the role to.
     - `description` - (Optional) A description of the role assignment.
     - `skip_service_principal_aad_check` - (Optional) Whether to skip the AAD check for service principals.
