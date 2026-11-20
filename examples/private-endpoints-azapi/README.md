@@ -49,15 +49,16 @@ resource "azapi_resource" "keyvault" {
   location  = azapi_resource.rg.location
   name      = replace("kv${random_pet.name.id}2", "-", "")
   parent_id = azapi_resource.rg.id
-  type      = "Microsoft.KeyVault/vaults@2023-07-01"
+  type      = "Microsoft.KeyVault/vaults@2026-02-01"
   body = {
     properties = {
       sku = {
         family = "A"
         name   = "standard"
       }
-      tenantId       = data.azapi_client_config.current.tenant_id
-      accessPolicies = []
+      tenantId                = data.azapi_client_config.current.tenant_id
+      accessPolicies          = []
+      enableRbacAuthorization = false
     }
   }
 }
