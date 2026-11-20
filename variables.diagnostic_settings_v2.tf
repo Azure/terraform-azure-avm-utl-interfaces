@@ -1,6 +1,7 @@
 variable "diagnostic_settings_v2" {
   type = map(object({
-    name = optional(string, null)
+    name           = optional(string, null)
+    log_categories = optional(list(string), null)
     logs = optional(set(object({
       category       = optional(string, null)
       category_group = optional(string, null)
@@ -34,6 +35,7 @@ variable "diagnostic_settings_v2" {
   - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
   - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
   - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `log_categories` - (Optional) All log categories of the target resource, in the order that Azure returns them. When you set this list, the body contains every category in it: first the enabled categories from `logs`, then the other categories as disabled. Azure returns the categories in this order, so `azapi_resource` does not show a change at each plan. Use it only with `logs` entries that set `category`.
   - `logs` - (Optional) A set of log groups to send to the log analytics workspace.
   - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
   - `metrics` - (Optional) A set of metric categories to send to the log analytics workspace.
@@ -63,6 +65,18 @@ variable "diagnostic_settings_v2" {
       ]
     ))
     error_message = "Exactly one of: log `category` and log `category_group` must be set."
+  }
+  validation {
+    condition = alltrue(flatten(
+      [
+        for _, v in var.diagnostic_settings_v2 :
+        [
+          for log in v.logs :
+          log.category != null && contains(v.log_categories, log.category)
+        ] if v.log_categories != null
+      ]
+    ))
+    error_message = "When `log_categories` is set, each log must set `category`, and `log_categories` must contain that category."
   }
   validation {
     condition = alltrue(
