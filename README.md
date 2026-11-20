@@ -171,6 +171,7 @@ Description:   A map of diagnostic settings to create. The map key is deliberate
   - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
   - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
   - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `log_categories` - (Optional) All log categories of the target resource, in the order that Azure returns them. When you set this list, the body contains every category in it: first the enabled categories from `logs`, then the other categories as disabled. Azure returns the categories in this order, so `azapi_resource` does not show a change at each plan. Use it only with `logs` entries that set `category`.
   - `logs` - (Optional) A set of log groups to send to the log analytics workspace.
   - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
   - `metrics` - (Optional) A set of metric categories to send to the log analytics workspace.
@@ -182,7 +183,8 @@ Type:
 
 ```hcl
 map(object({
-    name = optional(string, null)
+    name           = optional(string, null)
+    log_categories = optional(list(string), null)
     logs = optional(set(object({
       category       = optional(string, null)
       category_group = optional(string, null)
